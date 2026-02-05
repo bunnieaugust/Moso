@@ -135,7 +135,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect }) =>
 
   return (
     <section id="products" className="py-16 md:py-24 bg-white dark:bg-dark-900 relative transition-colors duration-300">
-      <div className="container mx-auto px-4 md:px-20">
+      <div className="container mx-auto px-6 md:px-40">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -157,7 +157,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect }) =>
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[220px] md:auto-rows-[300px]"
+          className="grid grid-cols-4 gap-3 md:gap-4 auto-rows-[220px] md:auto-rows-[300px]"
         >
           {products.map((product) => (
             <ProductCard 

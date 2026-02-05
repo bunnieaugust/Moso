@@ -4,7 +4,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ProductShowcase from './components/ProductShowcase';
-// TechShowcase removed as per request
+import TechShowcase from './components/TechShowcase';
 import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -25,6 +25,7 @@ import ReturnPolicy from './components/ReturnPolicy';
 import UsageGuide from './components/UsageGuide';
 import ShippingPolicy from './components/ShippingPolicy';
 import ContactPage from './components/ContactPage';
+import AboutPage from './components/AboutPage'; // Import AboutPage
 
 import { CartItem, Product, User, Order, OrderInfo } from './types';
 
@@ -59,7 +60,7 @@ const INITIAL_DB_ORDERS: Order[] = [
 ];
 
 // Define possible views including new pages
-type ViewType = 'home' | 'shop' | 'product' | 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page';
+type ViewType = 'home' | 'shop' | 'about' | 'product' | 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page';
 
 function App() {
   // State
@@ -302,6 +303,8 @@ function App() {
             wishlistItems={wishlistItems}
           />
         );
+      case 'about':
+        return <AboutPage onNavigate={(id) => handleNavClick(id, 'view')} />;
       case 'product':
         return (
           <ProductDetailPage 
@@ -329,7 +332,7 @@ function App() {
           <>
             <Hero />
             
-            <section id="story" className="py-20 text-center container mx-auto px-6 md:px-20">
+            <section id="story" className="py-20 text-center container mx-auto px-6">
               <p className="text-gold-500 dark:text-gold-400 uppercase tracking-[0.3em] text-xs mb-4 animate-pulse">Triết Lý Moso</p>
               <p className="font-serif text-2xl md:text-3xl text-stone-600 dark:text-stone-300 italic max-w-2xl mx-auto">
                 "Không chỉ là chè dưỡng nhan, Moso là sự kết hợp hoàn hảo giữa y học cổ truyền và công nghệ thực phẩm hiện đại, mang đến sự tiện lợi mà vẫn giữ nguyên vẹn tinh túy của đất trời."
@@ -337,7 +340,7 @@ function App() {
             </section>
 
             <ProductShowcase onProductSelect={handleProductSelect} />
-            {/* TechShowcase removed */}
+            <TechShowcase />
             <Testimonials />
             <Contact />
           </>

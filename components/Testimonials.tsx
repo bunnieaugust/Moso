@@ -27,14 +27,41 @@ const testimonials: Testimonial[] = [
     content: 'Set quà Tết Moso rất ấn tượng. Đối tác của tôi khen ngợi công nghệ lạ mắt và hương vị tinh tế. Bao bì thiết kế rất có gu.',
     rating: 5,
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop'
+  },
+  {
+    id: '4',
+    name: 'Minh Thư',
+    role: 'Sinh viên',
+    content: 'Bao bì đẹp xỉu, chụp hình sống ảo hết nước chấm. Vị chè không bị ngọt gắt như ngoài hàng, ăn xong thấy mát người hẳn.',
+    rating: 5,
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150&auto=format&fit=crop'
+  },
+  {
+    id: '5',
+    name: 'Cô Hạnh',
+    role: 'Nội trợ',
+    content: 'Mua cho cả nhà dùng thử, ai cũng khen. Tiện lợi cho người già không phải đun nấu lỉnh kỉnh. Giao hàng rất nhanh.',
+    rating: 4,
+    avatar: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=150&auto=format&fit=crop'
+  },
+  {
+    id: '6',
+    name: 'Ngọc Lan',
+    role: 'Designer',
+    content: 'Thiết kế bao bì rất sang trọng, mình hay mua làm quà tặng sinh nhật cho bạn bè. Chất lượng chè ổn định, nhựa đào giòn ngon.',
+    rating: 5,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'
   }
 ];
 
 const Testimonials: React.FC = () => {
+  // Duplicate the list to create a seamless infinite loop
+  const carouselItems = [...testimonials, ...testimonials];
+
   return (
     <section id="testimonials" className="py-24 bg-stone-100 dark:bg-dark-900 overflow-hidden transition-colors duration-300">
-      <div className="container mx-auto px-6 md:px-20">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+      <div className="container mx-auto px-6 md:px-40 mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6">
           <div className="max-w-xl">
              <span className="text-gold-600 dark:text-gold-400 uppercase tracking-widest text-sm font-semibold">Lời Hồi Đáp</span>
              <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mt-2">
@@ -48,16 +75,29 @@ const Testimonials: React.FC = () => {
             <p className="text-stone-600 dark:text-stone-400 text-sm ml-2">4.9/5 từ hơn 2,000 đánh giá</p>
           </div>
         </div>
+      </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((item, idx) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.2 }}
-              viewport={{ once: true }}
-              className="glass-card bg-white/60 dark:bg-white/5 p-8 rounded-2xl relative group border border-stone-200 dark:border-white/5 shadow-sm dark:shadow-none"
+      {/* Infinite Carousel Container */}
+      <div className="relative w-full overflow-hidden mask-gradient-x">
+        {/* Gradient Masks for fading effect at edges */}
+        <div className="absolute top-0 left-0 h-full w-20 md:w-40 bg-gradient-to-r from-stone-100 dark:from-dark-900 to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 right-0 h-full w-20 md:w-40 bg-gradient-to-l from-stone-100 dark:from-dark-900 to-transparent z-10 pointer-events-none" />
+
+        <motion.div 
+          className="flex gap-6 w-max px-6"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ 
+            duration: 60, // Adjust speed here (higher = slower)
+            ease: "linear", 
+            repeat: Infinity 
+          }}
+          // Pause animation on hover
+          whileHover={{ animationPlayState: "paused" }} 
+        >
+          {carouselItems.map((item, idx) => (
+            <div
+              key={`${item.id}-${idx}`}
+              className="w-[350px] md:w-[450px] flex-shrink-0 glass-card bg-white/60 dark:bg-white/5 p-8 rounded-2xl relative group border border-stone-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-gold-500/30 transition-colors"
             >
               <Quote className="absolute top-6 right-6 text-stone-200 dark:text-white/5 group-hover:text-gold-500/20 transition-colors" size={48} />
               
@@ -74,17 +114,22 @@ const Testimonials: React.FC = () => {
               </div>
 
               <div className="flex text-gold-500 dark:text-gold-400 mb-4 text-xs">
-                {[...Array(item.rating)].map((_, i) => (
-                  <Star key={i} fill="currentColor" size={14} />
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    fill={i < item.rating ? "currentColor" : "none"} 
+                    className={i < item.rating ? "" : "text-stone-300 dark:text-stone-700"}
+                    size={14} 
+                  />
                 ))}
               </div>
 
-              <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-sm">
+              <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-sm line-clamp-3">
                 "{item.content}"
               </p>
-            </motion.div>
+            </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

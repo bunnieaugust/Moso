@@ -31,8 +31,8 @@ const steps = [
 
 const TechShowcase: React.FC = () => {
   return (
-    <section id="technology" className="py-24 relative overflow-hidden bg-stone-50 dark:bg-dark-950 transition-colors duration-300">
-      <div className="container mx-auto px-6 md:px-20 relative z-10">
+    <section id="technology" className="py-24 relative overflow-hidden bg-stone-5 dark:bg-dark-950 transition-colors duration-300">
+      <div className="container mx-auto px-6 md:px-40 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           
           {/* LEFT: Visual Card */}
@@ -58,18 +58,18 @@ const TechShowcase: React.FC = () => {
                />
                
                {/* Simulated Flame/Smoke Graphics */}
-               <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-orange-500/80 animate-float opacity-50">
+               <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-orange-500/80 animate-flame opacity-60 mix-blend-screen">
                   <Flame size={64} />
                </div>
             </div>
 
             {/* Floating Info Points */}
-            <div className="absolute top-1/3 left-8 md:left-12 flex items-center gap-3 opacity-60">
-               <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white">
-                  <Zap size={14} />
+            <div className="absolute top-1/3 left-8 md:left-12 flex items-center gap-3 opacity-90">
+               <div className="w-8 h-8 rounded-full border border-orange-500/30 bg-orange-500/10 flex items-center justify-center text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                  <Flame size={14} className="animate-flame" />
                </div>
-               <div className="hidden md:block w-24 h-[1px] bg-gradient-to-r from-white/20 to-transparent" />
-               <span className="hidden md:block text-xs text-stone-400 font-mono">Heating Core</span>
+               <div className="hidden md:block w-24 h-[1px] bg-gradient-to-r from-orange-500/30 to-transparent" />
+               <span className="hidden md:block text-xs text-orange-100 font-mono">Heating Core</span>
             </div>
 
             <div className="absolute bottom-1/3 left-8 md:left-12 flex items-center gap-3 opacity-60">

@@ -41,7 +41,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   return (
     <div className="pt-24 pb-20 min-h-screen bg-stone-50 dark:bg-dark-950 transition-colors duration-300">
-      <div className="container mx-auto px-6 md:px-20">
+      <div className="container mx-auto px-6 md:px-40">
         {/* Breadcrumb & Back */}
         <div className="flex items-center gap-2 text-sm text-stone-500 mb-8">
           <button 

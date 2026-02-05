@@ -16,11 +16,11 @@ interface HeaderProps {
   onNavClick?: (sectionId: string, type?: 'scroll' | 'view') => void; // Updated signature
 }
 
-// Updated NavItems with 'view' type for Shop and Contact replacing Technology
+// Updated NavItems: Replaced 'Technology' with 'Contact' (view type)
 const navItems: NavItem[] = [
-  { label: 'Cửa Hàng', href: 'shop', type: 'view' },
-  { label: 'Về Moso', href: 'story', type: 'scroll' },
-  { label: 'Liên Hệ', href: 'contact-page', type: 'view' }, // Replaced Technology
+  { label: 'Cửa Hàng', href: 'shop', type: 'view' }, // Shop Page
+  { label: 'Về Moso', href: 'about', type: 'view' }, // About Page
+  { label: 'Liên Hệ', href: 'contact-page', type: 'view' }, // Contact Page (Replaces Technology)
   { label: 'Đánh Giá', href: 'testimonials', type: 'scroll' },
 ];
 
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
       
       {/* Dynamic Island style container */}
       <div className={`
-        relative mx-auto max-w-7xl px-5 md:px-20
+        relative mx-auto max-w-[1440px] px-6 md:px-40
         transition-all duration-500 z-50
       `}>
         <div className={`

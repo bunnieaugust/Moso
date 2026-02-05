@@ -10,7 +10,7 @@ interface ReturnPolicyProps {
 const ReturnPolicy: React.FC<ReturnPolicyProps> = ({ onBack }) => {
   return (
     <div className="pt-24 pb-20 min-h-screen bg-stone-50 dark:bg-dark-950 transition-colors duration-300">
-      <div className="container mx-auto px-6 max-w-4xl">
+      <div className="container mx-auto px-6 md:px-40 max-w-4xl">
         <button 
           onClick={onBack} 
           className="flex items-center gap-2 text-stone-500 hover:text-gold-500 transition-colors mb-8 group"

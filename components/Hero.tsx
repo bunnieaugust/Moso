@@ -21,7 +21,7 @@ const Hero: React.FC = () => {
         <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
       </div>
 
-      <div className="container relative mx-auto px-6 md:px-20 z-10 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container relative mx-auto px-6 md:px-40 z-10 grid lg:grid-cols-2 gap-12 items-center">
         {/* Text Content */}
         <motion.div 
           initial={{ opacity: 0, x: -50 }}

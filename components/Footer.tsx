@@ -1,22 +1,16 @@
-import React, { Suspense, ReactNode } from 'react';
+import React, { Suspense, Component, ReactNode } from 'react';
 import { Facebook, Instagram, Youtube, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Lazy load Spline to avoid blocking initial render
 const Spline = React.lazy(() => import('@splinetool/react-spline'));
 
-interface SplineErrorBoundaryProps {
-  children?: ReactNode;
-  fallback: ReactNode;
-}
-
-interface SplineErrorBoundaryState {
-  hasError: boolean;
-}
-
 // Simple Error Boundary to catch WebGL context errors
-class SplineErrorBoundary extends React.Component<SplineErrorBoundaryProps, SplineErrorBoundaryState> {
-  state: SplineErrorBoundaryState = { hasError: false };
+class SplineErrorBoundary extends Component<{children: ReactNode, fallback: ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: ReactNode, fallback: ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
   static getDerivedStateFromError() {
     return { hasError: true };

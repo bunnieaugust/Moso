@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Instagram, Facebook, Youtube } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowUpRight, Instagram, Facebook, Youtube, Send, MapPin, Mail, Phone, ChevronDown, Check } from 'lucide-react';
 import Button from './ui/Button';
 
 interface ContactPageProps {
@@ -8,133 +8,388 @@ interface ContactPageProps {
 }
 
 const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
+  const [formState, setFormState] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    topic: '',
+    interests: [] as string[],
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const interestOptions = [
+    { id: 'beauty', label: 'Tư vấn dưỡng nhan' },
+    { id: 'gift', label: 'Quà tặng doanh nghiệp' },
+    { id: 'partner', label: 'Hợp tác đại lý' },
+    { id: 'other', label: 'Khác' }
+  ];
+
+  const faqs = [
+    {
+      question: "Sản phẩm Moso có hạn sử dụng bao lâu?",
+      answer: "Nhờ công nghệ tiệt trùng Retort hiện đại, chè Moso có hạn sử dụng lên đến 12 tháng ở nhiệt độ thường mà không cần chất bảo quản. Tuy nhiên, để giữ hương vị tươi ngon nhất, chúng tôi khuyến khích sử dụng trong vòng 6 tháng kể từ ngày sản xuất."
+    },
+    {
+      question: "Cách sử dụng gói tự sôi như thế nào?",
+      answer: "Rất đơn giản! Bạn chỉ cần xé gói kích nhiệt đặt vào đáy hộp nhựa đen, đổ nước lạnh (nước lọc thường) đến vạch mức quy định, đặt bát chè lên trên và đậy nắp thật chặt. Chờ 8 phút cho chè nóng đến 90°C là có thể thưởng thức."
+    },
+    {
+      question: "Tôi có cần bảo quản lạnh không?",
+      answer: "Không bắt buộc. Sản phẩm có thể bảo quản ở nhiệt độ phòng, nơi thoáng mát, tránh ánh nắng trực tiếp. Tuy nhiên, nếu bạn thích ăn lạnh, có thể để ngăn mát tủ lạnh trước khi dùng (không sử dụng gói tự sôi trong trường hợp này)."
+    },
+    {
+      question: "Moso có giao hàng hỏa tốc không?",
+      answer: "Có. Tại khu vực nội thành TP.HCM, Moso hỗ trợ giao hàng hỏa tốc trong 2-4 giờ. Đối với các tỉnh thành khác, thời gian giao hàng tiêu chuẩn là từ 2-4 ngày làm việc."
+    },
+    {
+      question: "Chính sách đổi trả hàng như thế nào?",
+      answer: "Chúng tôi hỗ trợ đổi mới 1-1 trong vòng 07 ngày nếu sản phẩm bị lỗi bao bì (phồng, rách), hư hỏng do vận chuyển hoặc gói tự sôi không hoạt động. Vui lòng quay video khi mở hàng để được hỗ trợ nhanh nhất."
+    }
+  ];
+
+  const handleInterestToggle = (id: string) => {
+    setFormState(prev => {
+      const exists = prev.interests.includes(id);
+      if (exists) {
+        return { ...prev, interests: prev.interests.filter(item => item !== id) };
+      } else {
+        return { ...prev, interests: [...prev.interests, id] };
+      }
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert("Cảm ơn bạn đã liên hệ. Moso sẽ phản hồi sớm nhất!");
+      setFormState({ name: '', email: '', phone: '', topic: '', interests: [], message: '' });
+    }, 1500);
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }
+    }
+  };
+
   return (
-    <div className="pt-32 pb-24 min-h-screen bg-stone-50 dark:bg-dark-950 transition-colors duration-300">
-      
-      {/* Back Button */}
-      <div className="container mx-auto px-6 md:px-20 mb-12">
+    <div className="min-h-screen bg-stone-50 dark:bg-dark-950 transition-colors duration-500 pt-32 pb-20">
+      <div className="container mx-auto px-6 md:px-20 lg:px-40">
+        
+        {/* Back Button */}
         <button 
           onClick={onBack} 
-          className="flex items-center gap-2 text-sm text-stone-500 hover:text-gold-500 transition-colors group uppercase tracking-widest"
+          className="group flex items-center gap-2 text-stone-500 hover:text-stone-900 dark:hover:text-stone-200 transition-colors text-xs tracking-[0.2em] uppercase font-medium mb-16"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          <span>Quay lại</span>
+          Quay lại
         </button>
-      </div>
 
-      <div className="container mx-auto px-6 md:px-20">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-32">
-          
-          {/* Left Column: Information */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="font-serif text-5xl md:text-7xl text-stone-900 dark:text-stone-100 mb-8 leading-none">
-              Liên Hệ
-            </h1>
-            <p className="text-xl md:text-2xl text-stone-600 dark:text-stone-300 font-serif italic mb-16 leading-relaxed">
-              Chúng tôi luôn mong muốn lắng nghe từ bạn. <br/>
-              Hãy chia sẻ những câu chuyện và trải nghiệm cùng Moso.
-            </p>
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid lg:grid-cols-2 gap-12 lg:gap-24 mb-32"
+        >
+          {/* LEFT COLUMN: Info & Map */}
+          <div className="space-y-12">
+            <motion.div variants={itemVariants}>
+              <h1 className="font-serif text-6xl md:text-7xl text-stone-900 dark:text-stone-100 leading-none mb-8">
+                Liên Hệ
+              </h1>
+              <p className="text-stone-600 dark:text-stone-400 text-lg font-light leading-relaxed max-w-md">
+                Moso luôn sẵn lòng lắng nghe bạn. Bạn cần tư vấn về bí quyết dưỡng nhan? Đó là niềm đam mê lớn nhất của chúng tôi. Hãy kết nối trực tiếp với đội ngũ tận tâm ngay bên dưới.
+              </p>
+            </motion.div>
 
-            <div className="space-y-12">
-              <div>
-                <h3 className="text-xs uppercase tracking-[0.2em] text-stone-400 mb-4 font-bold">Hỗ trợ chung</h3>
-                <a href="mailto:cskh@moso.vn" className="block text-lg text-stone-800 dark:text-stone-200 hover:text-gold-500 transition-colors mb-1">
-                  cskh@moso.vn
-                </a>
-                <a href="tel:1900xxxx" className="block text-lg text-stone-800 dark:text-stone-200 hover:text-gold-500 transition-colors">
-                  1900 xxxx
-                </a>
-              </div>
+            {/* STYLED CONTACT INFO CARD */}
+            <motion.div variants={itemVariants} className="relative group">
+              {/* Glow Effect Background */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-gold-500/20 via-rose-500/10 to-gold-500/20 rounded-[2.2rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+              
+              <div className="relative bg-white dark:bg-stone-900/80 backdrop-blur-xl p-8 md:p-10 rounded-[2rem] border border-stone-100 dark:border-white/10 shadow-xl shadow-stone-200/50 dark:shadow-black/50 overflow-hidden">
+                {/* Decorative Background Blob */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
 
-              <div>
-                <h3 className="text-xs uppercase tracking-[0.2em] text-stone-400 mb-4 font-bold">Hợp tác & Kinh doanh</h3>
-                <a href="mailto:hoptac@moso.vn" className="block text-lg text-stone-800 dark:text-stone-200 hover:text-gold-500 transition-colors">
-                  hoptac@moso.vn
-                </a>
-              </div>
+                <div className="grid sm:grid-cols-2 gap-10 relative z-10">
+                  {/* Address Section */}
+                  <div className="space-y-6">
+                    <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-white/5 flex items-center justify-center text-gold-600 dark:text-gold-400 border border-stone-200 dark:border-white/5 shadow-inner">
+                      <MapPin size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 mb-3">Trụ Sở Chính</h3>
+                      <address className="not-italic text-stone-900 dark:text-stone-200 font-serif text-xl leading-relaxed">
+                        123 Nguyễn Huệ,<br />
+                        Phường Bến Nghé,<br />
+                        Quận 1, TP.HCM
+                      </address>
+                      <a 
+                        href="https://www.google.com/maps" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-gold-600 dark:text-gold-400 hover:text-gold-500 mt-3 font-medium group/link"
+                      >
+                        Xem bản đồ <ArrowUpRight size={14} className="group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+                      </a>
+                    </div>
+                  </div>
 
-              <div>
-                <h3 className="text-xs uppercase tracking-[0.2em] text-stone-400 mb-4 font-bold">Địa chỉ</h3>
-                <p className="text-lg text-stone-800 dark:text-stone-200 leading-relaxed">
-                  123 Đường Nguyễn Huệ,<br/>
-                  Phường Bến Nghé, Quận 1,<br/>
-                  TP. Hồ Chí Minh, Việt Nam
-                </p>
-              </div>
-
-              <div>
-                 <h3 className="text-xs uppercase tracking-[0.2em] text-stone-400 mb-4 font-bold">Mạng xã hội</h3>
-                 <div className="flex gap-6">
-                    <a href="#" className="text-stone-800 dark:text-stone-200 hover:text-gold-500 transition-colors"><Instagram size={24} strokeWidth={1.5} /></a>
-                    <a href="#" className="text-stone-800 dark:text-stone-200 hover:text-gold-500 transition-colors"><Facebook size={24} strokeWidth={1.5} /></a>
-                    <a href="#" className="text-stone-800 dark:text-stone-200 hover:text-gold-500 transition-colors"><Youtube size={24} strokeWidth={1.5} /></a>
-                 </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right Column: Minimal Form */}
-          <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8, delay: 0.2 }}
-             className="pt-10 lg:pt-0"
-          >
-             <form className="space-y-8">
-                <div className="group">
-                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Họ và tên</label>
-                   <input 
-                      type="text" 
-                      className="w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-xl text-stone-900 dark:text-stone-100 focus:outline-none focus:border-gold-500 transition-colors rounded-none placeholder:text-stone-300 dark:placeholder:text-stone-700"
-                      placeholder="Tên của bạn"
-                   />
+                  {/* Contact Info Section */}
+                  <div className="space-y-6">
+                    <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-white/5 flex items-center justify-center text-gold-600 dark:text-gold-400 border border-stone-200 dark:border-white/5 shadow-inner">
+                      <Phone size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 mb-3">Thông Tin</h3>
+                      <div className="space-y-2">
+                        <a href="mailto:hello@moso.vn" className="block text-stone-900 dark:text-stone-200 font-serif text-xl hover:text-gold-600 transition-colors">
+                          hello@moso.vn
+                        </a>
+                        <a href="tel:1900888999" className="block text-stone-900 dark:text-stone-200 font-serif text-xl hover:text-gold-600 transition-colors">
+                          1900 888 999
+                        </a>
+                      </div>
+                      
+                      <div className="flex gap-3 pt-4">
+                        {[Facebook, Instagram, Youtube].map((Icon, i) => (
+                          <a key={i} href="#" className="w-10 h-10 rounded-full border border-stone-200 dark:border-white/10 flex items-center justify-center text-stone-400 hover:text-white hover:bg-gold-500 hover:border-gold-500 transition-all duration-300">
+                            <Icon size={18} />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+            </motion.div>
 
-                <div className="group">
-                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Email</label>
-                   <input 
+            {/* Map Integration */}
+            <motion.div variants={itemVariants} className="w-full aspect-[2/1] bg-stone-200 dark:bg-white/5 rounded-[2rem] overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 relative group border border-stone-200 dark:border-white/10 shadow-lg">
+               <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.424167419736!2d106.70175531533418!3d10.7746922620963!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4682442d33%3A0x53c94488b394747!2zMTIzIMSQLiBOZ3V54buFbiBIdeG7hywgQuG6v24gTmdow6ksIFF14bqtbiAxLCBI4buTIENow60gTWluaCwgVmlldG5hbQ!5e0!3m2!en!us!4v1620000000000!5m2!en!us"
+                className="w-full h-full border-0 opacity-80 group-hover:opacity-100 transition-opacity"
+                loading="lazy"
+              ></iframe>
+              <div className="absolute inset-0 pointer-events-none border border-black/5 dark:border-white/10 rounded-[2rem]" />
+            </motion.div>
+          </div>
+
+          {/* RIGHT COLUMN: Minimal Form */}
+          <div className="lg:pt-8">
+            <motion.div 
+              variants={itemVariants}
+              className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[2rem] border border-stone-100 dark:border-white/5 shadow-2xl shadow-stone-200/50 dark:shadow-none sticky top-32"
+            >
+              <h3 className="font-serif text-3xl text-stone-900 dark:text-stone-100 mb-8">Gửi tin nhắn</h3>
+              
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="space-y-6">
+                  {/* Subject Dropdown */}
+                  <div className="group relative">
+                    <div className="relative">
+                      <select 
+                        id="topic"
+                        value={formState.topic}
+                        onChange={e => setFormState({...formState, topic: e.target.value})}
+                        className="peer w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 pr-8 text-stone-900 dark:text-stone-100 outline-none focus:border-gold-600 dark:focus:border-gold-400 transition-colors appearance-none cursor-pointer text-lg"
+                      >
+                        <option value="" disabled selected className="hidden"></option>
+                        <option value="tu-van" className="bg-white dark:bg-stone-900">Tư vấn sản phẩm</option>
+                        <option value="don-hang" className="bg-white dark:bg-stone-900">Vấn đề đơn hàng</option>
+                        <option value="hop-tac" className="bg-white dark:bg-stone-900">Hợp tác doanh nghiệp</option>
+                        <option value="khac" className="bg-white dark:bg-stone-900">Khác</option>
+                      </select>
+                      <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" size={16} />
+                    </div>
+                    <label 
+                      htmlFor="topic"
+                      className="absolute left-0 -top-3.5 text-xs text-stone-500 dark:text-stone-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-stone-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-gold-600 dark:peer-focus:text-gold-400"
+                    >
+                      Chủ đề liên hệ
+                    </label>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="group relative">
+                      <input 
+                        type="text" 
+                        id="name"
+                        required
+                        value={formState.name}
+                        onChange={e => setFormState({...formState, name: e.target.value})}
+                        className="peer w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-stone-900 dark:text-stone-100 outline-none focus:border-gold-600 dark:focus:border-gold-400 transition-colors placeholder-transparent text-lg"
+                        placeholder="Name"
+                      />
+                      <label 
+                        htmlFor="name"
+                        className="absolute left-0 -top-3.5 text-xs text-stone-500 dark:text-stone-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-stone-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-gold-600 dark:peer-focus:text-gold-400"
+                      >
+                        Họ tên
+                      </label>
+                    </div>
+
+                    <div className="group relative">
+                      <input 
+                        type="tel" 
+                        id="phone"
+                        value={formState.phone}
+                        onChange={e => setFormState({...formState, phone: e.target.value})}
+                        className="peer w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-stone-900 dark:text-stone-100 outline-none focus:border-gold-600 dark:focus:border-gold-400 transition-colors placeholder-transparent text-lg"
+                        placeholder="Phone"
+                      />
+                      <label 
+                        htmlFor="phone"
+                        className="absolute left-0 -top-3.5 text-xs text-stone-500 dark:text-stone-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-stone-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-gold-600 dark:peer-focus:text-gold-400"
+                      >
+                        Số điện thoại
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="group relative">
+                    <input 
                       type="email" 
-                      className="w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-xl text-stone-900 dark:text-stone-100 focus:outline-none focus:border-gold-500 transition-colors rounded-none placeholder:text-stone-300 dark:placeholder:text-stone-700"
-                      placeholder="email@example.com"
-                   />
+                      id="email"
+                      required
+                      value={formState.email}
+                      onChange={e => setFormState({...formState, email: e.target.value})}
+                      className="peer w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-stone-900 dark:text-stone-100 outline-none focus:border-gold-600 dark:focus:border-gold-400 transition-colors placeholder-transparent text-lg"
+                      placeholder="Email"
+                    />
+                    <label 
+                      htmlFor="email"
+                      className="absolute left-0 -top-3.5 text-xs text-stone-500 dark:text-stone-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-stone-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-gold-600 dark:peer-focus:text-gold-400"
+                    >
+                      Email liên hệ
+                    </label>
+                  </div>
+
+                  {/* Interests Checkboxes */}
+                  <div>
+                    <span className="block text-xs text-stone-500 dark:text-stone-400 mb-3">Nhu cầu của bạn</span>
+                    <div className="flex flex-wrap gap-3">
+                      {interestOptions.map((option) => {
+                        const isSelected = formState.interests.includes(option.id);
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() => handleInterestToggle(option.id)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-all duration-300 ${
+                              isSelected 
+                                ? 'bg-stone-900 dark:bg-stone-100 border-stone-900 dark:border-stone-100 text-white dark:text-stone-900' 
+                                : 'bg-transparent border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:border-gold-500'
+                            }`}
+                          >
+                            {isSelected && <Check size={12} />}
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="group relative">
+                    <textarea 
+                      id="message"
+                      rows={3}
+                      value={formState.message}
+                      onChange={e => setFormState({...formState, message: e.target.value})}
+                      className="peer w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-stone-900 dark:text-stone-100 outline-none focus:border-gold-600 dark:focus:border-gold-400 transition-colors placeholder-transparent text-lg resize-none"
+                      placeholder="Message"
+                    ></textarea>
+                    <label 
+                      htmlFor="message"
+                      className="absolute left-0 -top-3.5 text-xs text-stone-500 dark:text-stone-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-stone-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-gold-600 dark:peer-focus:text-gold-400"
+                    >
+                      Nội dung chi tiết
+                    </label>
+                  </div>
                 </div>
 
-                <div className="group">
-                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Chủ đề</label>
-                   <select className="w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-xl text-stone-900 dark:text-stone-100 focus:outline-none focus:border-gold-500 transition-colors rounded-none cursor-pointer appearance-none">
-                      <option className="bg-white dark:bg-dark-900">Tư vấn sản phẩm</option>
-                      <option className="bg-white dark:bg-dark-900">Đơn hàng & Vận chuyển</option>
-                      <option className="bg-white dark:bg-dark-900">Hợp tác kinh doanh</option>
-                      <option className="bg-white dark:bg-dark-900">Khác</option>
-                   </select>
+                <div className="pt-2">
+                  <Button 
+                    type="submit" 
+                    variant="primary" 
+                    className="w-full md:w-auto px-10 py-4 text-sm tracking-widest uppercase shadow-none hover:shadow-lg"
+                    isLoading={isSubmitting}
+                  >
+                    Gửi Thông Tin
+                  </Button>
                 </div>
+              </form>
+            </motion.div>
+          </div>
+        </motion.div>
 
-                <div className="group">
-                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Tin nhắn</label>
-                   <textarea 
-                      rows={5}
-                      className="w-full bg-transparent border-b border-stone-300 dark:border-stone-700 py-3 text-xl text-stone-900 dark:text-stone-100 focus:outline-none focus:border-gold-500 transition-colors rounded-none resize-none placeholder:text-stone-300 dark:placeholder:text-stone-700"
-                      placeholder="Nội dung tin nhắn..."
-                   ></textarea>
-                </div>
+        {/* FAQ Section - Clean Accordion Style */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="max-w-4xl mx-auto mt-20 md:mt-32"
+        >
+          <div className="text-center mb-16">
+            <span className="text-gold-600 dark:text-gold-400 uppercase tracking-widest text-xs font-bold mb-3 block">Hỗ Trợ Khách Hàng</span>
+            <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100">Câu Hỏi Thường Gặp</h2>
+          </div>
 
-                <div className="pt-8">
-                   <Button 
-                      variant="primary" 
-                      className="w-full md:w-auto px-12 py-4"
-                      icon={<ArrowRight size={18} />}
+          <div className="space-y-4">
+             {faqs.map((faq, index) => (
+                <div 
+                  key={index}
+                  className="border-b border-stone-200 dark:border-white/10 last:border-0"
+                >
+                   <button
+                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                     className="w-full py-6 flex items-center justify-between text-left group"
                    >
-                      Gửi Tin Nhắn
-                   </Button>
+                      <span className={`font-serif text-xl transition-colors duration-300 ${openFaqIndex === index ? 'text-gold-600 dark:text-gold-400' : 'text-stone-800 dark:text-stone-200 group-hover:text-gold-500'}`}>
+                         {faq.question}
+                      </span>
+                      <span className={`text-stone-400 transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180 text-gold-500' : 'group-hover:text-gold-500'}`}>
+                         <ChevronDown size={20} />
+                      </span>
+                   </button>
+                   <AnimatePresence>
+                      {openFaqIndex === index && (
+                         <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                         >
+                            <p className="pb-8 text-stone-600 dark:text-stone-400 font-light leading-relaxed text-lg">
+                               {faq.answer}
+                            </p>
+                         </motion.div>
+                      )}
+                   </AnimatePresence>
                 </div>
-             </form>
-          </motion.div>
-
-        </div>
+             ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   );

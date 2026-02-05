@@ -18,7 +18,7 @@ const Contact: React.FC = () => {
           <div className="absolute inset-0 bg-dark-950/80 backdrop-blur-[2px]" />
         </div>
 
-        <div className="container mx-auto px-6 md:px-20 relative z-10 text-center">
+        <div className="container mx-auto px-6 md:px-40 relative z-10 text-center">
           <div className="max-w-3xl mx-auto glass-panel p-12 rounded-[2rem] border border-white/10 shadow-2xl">
             <h2 className="font-serif text-4xl md:text-5xl text-stone-100 mb-6">
               Bạn Đã Sẵn Sàng <br/>
