@@ -8,6 +8,7 @@ import AuthPopover from './AuthPopover';
 import { Language, translations } from '../utils/translations';
 
 interface HeaderProps {
+  currentView?: string;
   cartCount: number;
   wishlistCount: number;
   onOpenCart: () => void;
@@ -25,6 +26,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ 
+  currentView,
   cartCount, 
   wishlistCount,
   onOpenCart, 
@@ -163,31 +165,42 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <div 
-                key={item.label} 
-                className="relative"
-                onMouseEnter={item.type === 'dropdown' ? handleResourcesMouseEnter : undefined}
-                onMouseLeave={item.type === 'dropdown' ? handleResourcesMouseLeave : undefined}
-              >
-                <a
-                  href={`#${item.href}`}
-                  onClick={(e) => handleNavigation(e, item)}
-                  className={`
-                    text-sm font-medium transition-colors tracking-wide relative py-3 flex items-center gap-1
-                    ${item.type === 'dropdown' && isResourcesHovered ? 'text-gold-600 dark:text-gold-300' : 'text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300'}
-                  `}
+            {navItems.map((item) => {
+              // Calculate active state
+              // For Resources dropdown, verify if any of sub-pages are active
+              const isResourcesActive = item.type === 'dropdown' && ['waitlist', 'rewards', 'blog', 'faq'].includes(currentView || '');
+              const isActive = currentView === item.href || isResourcesActive;
+              
+              // Resources hover state for visual feedback when menu is open
+              const isDropdownOpen = item.type === 'dropdown' && isResourcesHovered;
+
+              return (
+                <div 
+                  key={item.label} 
+                  className="relative"
+                  onMouseEnter={item.type === 'dropdown' ? handleResourcesMouseEnter : undefined}
+                  onMouseLeave={item.type === 'dropdown' ? handleResourcesMouseLeave : undefined}
                 >
-                  {item.label}
-                  {item.type === 'dropdown' && (
-                    <ChevronDown size={14} className={`transition-transform duration-300 ${isResourcesHovered ? 'rotate-180' : ''}`} />
-                  )}
-                  {item.type !== 'dropdown' && (
-                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold-400 transition-all hover:w-full"></span>
-                  )}
-                </a>
-              </div>
-            ))}
+                  <a
+                    href={`#${item.href}`}
+                    onClick={(e) => handleNavigation(e, item)}
+                    className={`
+                      text-sm font-medium transition-colors tracking-wide relative py-3 flex items-center gap-1
+                      ${isActive || isDropdownOpen ? 'text-gold-600 dark:text-gold-300' : 'text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300'}
+                    `}
+                  >
+                    {item.label}
+                    {item.type === 'dropdown' && (
+                      <ChevronDown size={14} className={`transition-transform duration-300 ${isResourcesHovered ? 'rotate-180' : ''}`} />
+                    )}
+                    {/* Underline Indicator for active state */}
+                    {item.type !== 'dropdown' && (
+                      <span className={`absolute -bottom-1 left-0 h-px bg-gold-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                    )}
+                  </a>
+                </div>
+              );
+            })}
           </nav>
 
           {/* MEGA MENU: RESOURCES */}
@@ -215,7 +228,7 @@ const Header: React.FC<HeaderProps> = ({
                            <button 
                              key={idx}
                              onClick={() => handleResourceClick(link.action)}
-                             className="text-left font-serif text-3xl text-stone-400 hover:text-stone-900 dark:text-stone-500 dark:hover:text-stone-100 transition-all duration-300 hover:translate-x-2"
+                             className={`text-left font-serif text-3xl transition-all duration-300 hover:translate-x-2 ${currentView === link.action ? 'text-gold-600 dark:text-gold-400 font-bold' : 'text-stone-400 hover:text-stone-900 dark:text-stone-500 dark:hover:text-stone-100'}`}
                            >
                              {link.label}
                            </button>
@@ -318,7 +331,7 @@ const Header: React.FC<HeaderProps> = ({
                ) : (
                   <Button 
                      variant="primary" 
-                     className="!py-2.5 !px-6 text-xs ml-2 flex items-center gap-2 shadow-lg" 
+                     className="!py-2.5 !px-6 text-xs ml-2 flex items-center gap-2 shadow-lg hover:scale-105 transition-transform duration-300" 
                      onClick={() => onOpenAuth('login')}
                      icon={<UserIcon size={16} />}
                   >
@@ -391,11 +404,16 @@ const Header: React.FC<HeaderProps> = ({
         ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
       `}>
         {navItems.map((item) => {
+          // Mobile Active state
+          const isActive = currentView === item.href || (item.type === 'dropdown' && ['waitlist', 'rewards', 'blog', 'faq'].includes(currentView || ''));
+
           if (item.type === 'dropdown') {
              // Mobile view for dropdown (simplified to just main label or link to FAQs)
              return (
                <div key={item.label} className="flex flex-col items-center gap-2">
-                  <span className="text-2xl font-serif text-stone-800 dark:text-gold-100">{item.label}</span>
+                  <span className={`text-2xl font-serif ${isActive ? 'text-gold-600 dark:text-gold-400' : 'text-stone-800 dark:text-gold-100'}`}>
+                    {item.label}
+                  </span>
                   <div className="flex flex-col items-center gap-2 text-sm text-stone-500">
                      <button onClick={() => { setIsMobileMenuOpen(false); onNavClick && onNavClick('waitlist', 'view'); }}>{t.resourceMenu.waitlist}</button>
                      <button onClick={() => { setIsMobileMenuOpen(false); onNavClick && onNavClick('rewards', 'view'); }}>{t.resourceMenu.rewards}</button>
@@ -410,7 +428,7 @@ const Header: React.FC<HeaderProps> = ({
               key={item.label}
               href={`#${item.href}`}
               onClick={(e) => handleNavigation(e, item)}
-              className="text-2xl font-serif text-stone-800 dark:text-gold-100 hover:text-gold-500 dark:hover:text-gold-400 transition-colors"
+              className={`text-2xl font-serif transition-colors ${isActive ? 'text-gold-600 dark:text-gold-400 underline decoration-gold-500 underline-offset-4' : 'text-stone-800 dark:text-gold-100 hover:text-gold-500 dark:hover:text-gold-400'}`}
             >
               {item.label}
             </a>

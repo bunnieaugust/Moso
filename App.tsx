@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { motion } from 'framer-motion'; // Ensure motion is imported
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ProductShowcase from './components/ProductShowcase';
@@ -386,6 +387,9 @@ function App() {
         return <WaitlistPage onBack={() => setView('home')} language={language} />;
       case 'home':
       default:
+        // Parse story content for staggered animation
+        const storyWords = t.story.content.split(" ");
+        
         return (
           <>
             <Hero language={language} />
@@ -394,9 +398,32 @@ function App() {
               <p className="text-gold-500 dark:text-gold-400 uppercase tracking-[0.3em] text-xs mb-4 animate-pulse">
                 {t.story.label}
               </p>
-              <p className="font-serif text-2xl md:text-3xl text-stone-600 dark:text-stone-300 italic max-w-2xl mx-auto">
-                {t.story.content}
-              </p>
+              
+              {/* ANIMATED TEXT HERE */}
+              <motion.p 
+                className="font-serif text-2xl md:text-3xl text-stone-600 dark:text-stone-300 italic max-w-2xl mx-auto leading-relaxed"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-10%" }}
+                variants={{
+                  visible: { transition: { staggerChildren: 0.03 } },
+                  hidden: {}
+                }}
+              >
+                {storyWords.map((word, index) => (
+                  <motion.span
+                    key={index}
+                    variants={{
+                      hidden: { opacity: 0, y: 10, filter: 'blur(5px)' },
+                      visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+                    }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="inline-block mr-1.5"
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </motion.p>
             </section>
 
             <ProductShowcase 
@@ -419,6 +446,7 @@ function App() {
       <CustomCursor /> {/* Custom Cursor Added Here */}
       
       <Header 
+        currentView={view}
         cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
         wishlistCount={wishlistItems.length}
         onOpenCart={() => setIsCartOpen(true)}

@@ -1,6 +1,7 @@
+
 import React, { Component, Suspense, ReactNode, ErrorInfo } from 'react';
 import { Facebook, Instagram, Youtube, ArrowRight, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Language, translations } from '../utils/translations';
 
 // Lazy load Spline to avoid blocking initial render
@@ -46,14 +47,22 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onNavigate, language = 'vi' }) => {
   const t = translations[language].footer;
+  const { scrollYProgress } = useScroll();
+  
+  // Parallax effect: The 3D model moves slightly slower than the reveal
+  // When scroll is near end (0.8), model is shifted up (-100px). At end (1.0), it settles to 0.
+  const y = useTransform(scrollYProgress, [0.5, 1], [-150, 0]);
+  const opacity = useTransform(scrollYProgress, [0.7, 1], [0.5, 1]);
 
   return (
     // Fixed positioning for Parallax effect on desktop (hidden behind main content)
-    // Changed from -z-10 to z-0 to avoid being hidden behind body background if App has transparency
     <footer className="relative md:fixed md:bottom-0 md:left-0 md:w-full md:h-[500px] bg-dark-950 z-0 overflow-hidden flex flex-col md:flex-row">
       
-      {/* 3D Spline Interactive Area - Left Side */}
-      <div className="w-full md:w-1/2 h-[300px] md:h-full relative bg-gradient-to-br from-dark-900 to-black overflow-hidden order-2 md:order-1">
+      {/* 3D Spline Interactive Area - Left Side - WITH PARALLAX */}
+      <motion.div 
+        style={{ y, opacity }}
+        className="w-full md:w-1/2 h-[300px] md:h-full relative bg-gradient-to-br from-dark-900 to-black overflow-hidden order-2 md:order-1"
+      >
          <div className="absolute inset-0 z-0 opacity-60">
             <SplineErrorBoundary fallback={
                <img 
@@ -84,7 +93,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, language = 'vi' }) => {
               <p className="text-gold-400 uppercase tracking-[0.3em] text-xs font-medium">Beauty Dessert</p>
             </motion.div>
          </div>
-      </div>
+      </motion.div>
 
       {/* Content Area - Right Side */}
       <div className="w-full md:w-1/2 h-full bg-dark-950/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-white/5 p-8 md:p-16 flex flex-col justify-between order-1 md:order-2">

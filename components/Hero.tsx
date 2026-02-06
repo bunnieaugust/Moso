@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, Sparkles } from 'lucide-react';
@@ -83,7 +84,7 @@ const Hero: React.FC<HeroProps> = ({ language }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 text-white/50 flex flex-col items-center gap-2 animate-bounce"
+        className="absolute bottom-10 left-0 right-0 z-20 flex flex-col items-center gap-2 text-white/50 animate-bounce pointer-events-none"
       >
         <span className="text-xs uppercase tracking-widest">{t.scroll}</span>
         <ArrowDown size={20} />
