@@ -1,26 +1,31 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Mail, PackageSearch, AlertCircle } from 'lucide-react';
 import Button from './ui/Button';
+import { Language, translations } from '../utils/translations';
 
 interface OrderLookupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLookup: (orderId: string, email: string) => void;
+  language?: Language;
 }
 
-const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onClose, onLookup }) => {
+const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onClose, onLookup, language = 'vi' }) => {
   const [orderId, setOrderId] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const t = translations[language].orderLookup;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
     if (!orderId.trim() || !email.trim()) {
-      setError('Vui lòng nhập đầy đủ thông tin');
+      setError(t.errorMissing);
       return;
     }
 
@@ -60,15 +65,15 @@ const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onClose, on
                 <div className="w-16 h-16 bg-stone-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-stone-200 dark:border-white/10 text-gold-500">
                   <PackageSearch size={32} />
                 </div>
-                <h2 className="font-serif text-2xl text-stone-900 dark:text-stone-100">Tra Cứu Đơn Hàng</h2>
+                <h2 className="font-serif text-2xl text-stone-900 dark:text-stone-100">{t.title}</h2>
                 <p className="text-stone-500 dark:text-stone-400 text-sm mt-2">
-                  Kiểm tra trạng thái đơn hàng của bạn bằng Mã đơn hàng và Email đặt hàng.
+                  {t.desc}
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs uppercase text-stone-500 ml-1">Mã đơn hàng</label>
+                  <label className="text-xs uppercase text-stone-500 ml-1">{t.orderIdLabel}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-3.5 text-stone-400 dark:text-stone-500" size={18} />
                     <input 
@@ -76,13 +81,13 @@ const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onClose, on
                       value={orderId}
                       onChange={(e) => setOrderId(e.target.value)}
                       className="w-full bg-stone-50 dark:bg-dark-950 border border-stone-200 dark:border-white/10 rounded-xl py-3 pl-10 pr-4 text-stone-900 dark:text-stone-200 outline-none focus:border-gold-500/50 transition-colors font-mono placeholder:font-sans placeholder:text-stone-400 dark:placeholder:text-stone-600"
-                      placeholder="VD: 882194"
+                      placeholder={t.orderIdPlaceholder}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase text-stone-500 ml-1">Email đặt hàng</label>
+                  <label className="text-xs uppercase text-stone-500 ml-1">{t.emailLabel}</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3.5 text-stone-400 dark:text-stone-500" size={18} />
                     <input 
@@ -90,7 +95,7 @@ const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onClose, on
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full bg-stone-50 dark:bg-dark-950 border border-stone-200 dark:border-white/10 rounded-xl py-3 pl-10 pr-4 text-stone-900 dark:text-stone-200 outline-none focus:border-gold-500/50 transition-colors placeholder:text-stone-400 dark:placeholder:text-stone-600"
-                      placeholder="email@example.com"
+                      placeholder={t.emailPlaceholder}
                     />
                   </div>
                 </div>
@@ -107,7 +112,7 @@ const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ isOpen, onClose, on
                   className="w-full mt-4"
                   isLoading={isLoading}
                 >
-                  Tra Cứu Ngay
+                  {t.submitBtn}
                 </Button>
               </form>
             </div>

@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ShieldCheck, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
-import Button from './ui/Button';
+import FadeIn from './ui/FadeIn';
 
 interface ReturnPolicyProps {
   onBack: () => void;
@@ -19,11 +20,7 @@ const ReturnPolicy: React.FC<ReturnPolicyProps> = ({ onBack }) => {
           <span>Quay lại trang chủ</span>
         </button>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-dark-900 rounded-3xl p-8 md:p-12 border border-stone-200 dark:border-white/5 shadow-xl"
-        >
+        <FadeIn direction="up" className="bg-white dark:bg-dark-900 rounded-3xl p-8 md:p-12 border border-stone-200 dark:border-white/5 shadow-xl">
           <div className="flex items-center gap-4 mb-8">
             <div className="w-16 h-16 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-500">
               <RefreshCw size={32} />
@@ -106,7 +103,7 @@ const ReturnPolicy: React.FC<ReturnPolicyProps> = ({ onBack }) => {
               </p>
             </div>
           </div>
-        </motion.div>
+        </FadeIn>
       </div>
     </div>
   );

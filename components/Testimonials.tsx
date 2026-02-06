@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 import { Testimonial } from '../types';
 import { Language, translations } from '../utils/translations';
+import FadeIn from './ui/FadeIn';
+import LazyImage from './ui/LazyImage';
 
 interface TestimonialsProps {
   language?: Language;
@@ -11,7 +13,6 @@ interface TestimonialsProps {
 const Testimonials: React.FC<TestimonialsProps> = ({ language = 'vi' }) => {
   const t = translations[language].testimonials;
 
-  // Static images mapping to make translation array easier
   const avatars = [
      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop',
      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop',
@@ -21,91 +22,87 @@ const Testimonials: React.FC<TestimonialsProps> = ({ language = 'vi' }) => {
      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'
   ];
 
+  // Get all testimonials
   const testimonials: Testimonial[] = t.items.map((item: any, index: number) => ({
       id: String(index + 1),
       name: item.name,
       role: item.role,
       content: item.content,
-      rating: 5, // All 5 stars in this curated list
-      avatar: avatars[index]
+      rating: 5,
+      avatar: avatars[index % avatars.length]
   }));
 
-  // Duplicate the list to create a seamless infinite loop
+  // Duplicate items to create infinite scroll effect
   const carouselItems = [...testimonials, ...testimonials];
 
   return (
-    <section id="testimonials" className="py-24 bg-stone-100 dark:bg-dark-900 overflow-hidden transition-colors duration-300">
-      <div className="container mx-auto px-6 md:px-40 mb-16">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-          <div className="max-w-xl">
-             <span className="text-gold-600 dark:text-gold-400 uppercase tracking-widest text-sm font-semibold">{t.label}</span>
-             <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mt-2">
-               {t.title1} <br/> <span className="text-rose-500 dark:text-rose-400">{t.title2}</span>{t.questionMark}
+    <section id="testimonials" className="py-24 bg-white dark:bg-black transition-colors duration-500 overflow-hidden">
+      <div className="container mx-auto px-6 md:px-20 lg:px-40 mb-16">
+         <FadeIn direction="up" className="text-center">
+             <span className="text-gold-600 dark:text-gold-400 uppercase tracking-[0.3em] text-xs font-bold mb-4 block">
+               {t.label}
+             </span>
+             <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mb-4">
+               {t.title1} <span className="text-gold-500">Moso</span>{t.questionMark}
              </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex text-gold-500 dark:text-gold-400">
-              {[1,2,3,4,5].map(i => <Star key={i} fill="currentColor" size={20} />)}
-            </div>
-            <p className="text-stone-600 dark:text-stone-400 text-sm ml-2">{t.rating}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Infinite Carousel Container */}
-      <div className="relative w-full overflow-hidden mask-gradient-x">
-        {/* Gradient Masks for fading effect at edges */}
-        <div className="absolute top-0 left-0 h-full w-20 md:w-40 bg-gradient-to-r from-stone-100 dark:from-dark-900 to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 right-0 h-full w-20 md:w-40 bg-gradient-to-l from-stone-100 dark:from-dark-900 to-transparent z-10 pointer-events-none" />
-
-        <motion.div 
-          className="flex gap-6 w-max px-6"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ 
-            duration: 60, // Adjust speed here (higher = slower)
-            ease: "linear", 
-            repeat: Infinity 
-          }}
-          // Pause animation on hover
-          whileHover={{ animationPlayState: "paused" }} 
-        >
-          {carouselItems.map((item, idx) => (
-            <div
-              key={`${item.id}-${idx}`}
-              className="w-[350px] md:w-[450px] flex-shrink-0 glass-card bg-white/60 dark:bg-white/5 p-8 rounded-2xl relative group border border-stone-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-gold-500/30 transition-colors"
-            >
-              <Quote className="absolute top-6 right-6 text-stone-200 dark:text-white/5 group-hover:text-gold-500/20 transition-colors" size={48} />
-              
-              <div className="flex items-center gap-4 mb-6">
-                <img 
-                  src={item.avatar} 
-                  alt={item.name} 
-                  className="w-12 h-12 rounded-full object-cover border border-stone-200 dark:border-white/20"
-                />
-                <div>
-                  <h4 className="text-stone-800 dark:text-stone-100 font-serif text-lg">{item.name}</h4>
-                  <p className="text-gold-600 dark:text-gold-500/80 text-xs uppercase tracking-wide">{item.role}</p>
+             <div className="flex items-center justify-center gap-2 text-stone-500 dark:text-stone-400">
+                <div className="flex text-gold-500">
+                   {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
                 </div>
-              </div>
-
-              <div className="flex text-gold-500 dark:text-gold-400 mb-4 text-xs">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    fill={i < item.rating ? "currentColor" : "none"} 
-                    className={i < item.rating ? "" : "text-stone-300 dark:text-stone-700"}
-                    size={14} 
-                  />
-                ))}
-              </div>
-
-              <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-sm line-clamp-3">
-                "{item.content}"
-              </p>
-            </div>
-          ))}
-        </motion.div>
+                <span>{t.rating}</span>
+             </div>
+         </FadeIn>
       </div>
+
+      <FadeIn delay={0.2} direction="none" className="relative w-full">
+         {/* Gradient Masks for smooth fade out at edges */}
+         <div className="absolute top-0 left-0 w-20 md:w-40 h-full bg-gradient-to-r from-white dark:from-black to-transparent z-10 pointer-events-none" />
+         <div className="absolute top-0 right-0 w-20 md:w-40 h-full bg-gradient-to-l from-white dark:from-black to-transparent z-10 pointer-events-none" />
+
+         {/* Marquee Track */}
+         <motion.div
+           className="flex gap-6 w-max px-6"
+           animate={{ x: ["0%", "-50%"] }}
+           transition={{
+             duration: 60,
+             ease: "linear",
+             repeat: Infinity
+           }}
+           whileHover={{ animationPlayState: "paused" }}
+         >
+           {carouselItems.map((item, idx) => (
+              <div
+                 key={`${item.id}-${idx}`}
+                 className="w-[350px] md:w-[450px] flex-shrink-0 bg-stone-50 dark:bg-white/5 p-8 rounded-2xl border border-stone-200 dark:border-white/10 relative group hover:border-gold-500/50 transition-colors"
+              >
+                  <Quote className="text-gold-200 dark:text-gold-900 absolute top-6 right-6" size={40} />
+                  
+                  <div className="flex items-center gap-4 mb-6">
+                     <div className="w-12 h-12 rounded-full overflow-hidden border border-stone-200 group-hover:border-gold-500 transition-colors">
+                        <LazyImage 
+                          src={item.avatar} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover"
+                          containerClassName="w-full h-full"
+                        />
+                     </div>
+                     <div>
+                        <h4 className="font-bold text-stone-900 dark:text-stone-100">{item.name}</h4>
+                        <p className="text-xs text-stone-500 dark:text-stone-400">{item.role}</p>
+                     </div>
+                  </div>
+                  
+                  <p className="text-stone-600 dark:text-stone-300 italic leading-relaxed line-clamp-4">
+                     "{item.content}"
+                  </p>
+                  
+                  <div className="mt-6 flex text-gold-500">
+                     {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
+                  </div>
+              </div>
+           ))}
+         </motion.div>
+      </FadeIn>
     </section>
   );
 };

@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Clock, Zap, Sparkles, Thermometer } from 'lucide-react';
+import { Flame, Clock, Thermometer, Zap } from 'lucide-react';
 import { Language, translations } from '../utils/translations';
+import FadeIn from './ui/FadeIn';
 
 interface TechShowcaseProps {
   language?: Language;
@@ -9,139 +10,52 @@ interface TechShowcaseProps {
 
 const TechShowcase: React.FC<TechShowcaseProps> = ({ language = 'vi' }) => {
   const t = translations[language].tech;
-
-  const icons = [Zap, Thermometer, Clock, Sparkles];
-
-  const steps = t.steps.map((step, index) => ({
-    id: `0${index + 1}`,
-    icon: React.createElement(icons[index], { className: "w-5 h-5" }),
-    ...step
-  }));
+  
+  const icons = [Zap, Flame, Clock, Thermometer];
 
   return (
-    <section id="technology" className="py-24 relative overflow-hidden bg-stone-5 dark:bg-dark-950 transition-colors duration-300">
-      <div className="container mx-auto px-6 md:px-40 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
-          {/* LEFT: Visual Card */}
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative w-full aspect-[4/3] lg:aspect-square bg-[#0a0a0a] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center group"
-          >
-            {/* Background Atmosphere */}
-            <div className="absolute inset-0 bg-gradient-to-br from-stone-900/50 via-black to-black" />
-            
-            {/* Heat Glow Effect */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-orange-600/20 blur-[80px] rounded-full animate-pulse" />
-            
-            {/* Product Image */}
-            <div className="relative z-10 transform transition-transform duration-700 group-hover:scale-105">
-               <img 
-                 src="https://images.unsplash.com/photo-1542353974-912b5d448496?q=80&w=600&auto=format&fit=crop" 
-                 alt="Moso Self Heating" 
-                 className="w-48 md:w-64 drop-shadow-[0_20px_50px_rgba(234,88,12,0.3)] object-contain mask-image-gradient opacity-90"
-               />
-               
-               {/* Simulated Flame/Smoke Graphics */}
-               <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-orange-500/80 animate-flame opacity-60 mix-blend-screen">
-                  <Flame size={64} />
-               </div>
-            </div>
+    <section id="technology" className="py-24 bg-stone-50 dark:bg-dark-950 transition-colors duration-500 relative overflow-hidden">
+      {/* Decorative BG */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-5">
+         <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] rounded-full bg-gold-500 blur-[100px]" />
+         <div className="absolute bottom-[20%] right-[10%] w-[300px] h-[300px] rounded-full bg-rose-500 blur-[100px]" />
+      </div>
 
-            {/* Floating Info Points */}
-            <div className="absolute top-1/3 left-8 md:left-12 flex items-center gap-3 opacity-90">
-               <div className="w-8 h-8 rounded-full border border-orange-500/30 bg-orange-500/10 flex items-center justify-center text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
-                  <Flame size={14} className="animate-flame" />
-               </div>
-               <div className="hidden md:block w-24 h-[1px] bg-gradient-to-r from-orange-500/30 to-transparent" />
-               <span className="hidden md:block text-xs text-orange-100 font-mono">Heating Core</span>
-            </div>
+      <div className="container mx-auto px-6 md:px-20 relative z-10">
+        
+        <FadeIn direction="up" className="text-center max-w-3xl mx-auto mb-20">
+           <span className="text-gold-600 dark:text-gold-400 uppercase tracking-[0.3em] text-xs font-bold mb-4 block">
+             {t.badge}
+           </span>
+           <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mb-6">
+             {t.title1} <span className="text-gradient-gold italic">{t.title2}</span>
+           </h2>
+           <p className="text-stone-600 dark:text-stone-400 text-lg font-light leading-relaxed">
+             {t.desc}
+           </p>
+        </FadeIn>
 
-            <div className="absolute bottom-1/3 left-8 md:left-12 flex items-center gap-3 opacity-60">
-               <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white">
-                  <Thermometer size={14} />
-               </div>
-               <div className="hidden md:block w-24 h-[1px] bg-gradient-to-r from-white/20 to-transparent" />
-               <span className="hidden md:block text-xs text-stone-400 font-mono">Safe Reaction</span>
-            </div>
-
-            {/* Temperature Card Overlay with Floating Animation */}
-            <motion.div 
-               initial={{ opacity: 0, scale: 0.8 }}
-               whileInView={{ opacity: 1, scale: 1 }}
-               animate={{ y: [0, -12, 0] }} // Floating effect up and down
-               transition={{ 
-                 opacity: { duration: 0.5, delay: 0.5 },
-                 scale: { duration: 0.5, delay: 0.5 },
-                 y: {
-                   duration: 4,
-                   repeat: Infinity,
-                   ease: "easeInOut"
-                 }
-               }}
-               className="absolute bottom-8 right-8 bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center gap-4 shadow-lg z-20"
-            >
-               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
-                  <Thermometer size={24} />
-               </div>
-               <div>
-                  <div className="text-3xl font-bold text-white font-serif leading-none">90°C</div>
-                  <div className="text-xs text-stone-300 font-medium mt-1">{t.tempTitle}</div>
-               </div>
-            </motion.div>
-
-            {/* Brand Watermark */}
-            <div className="absolute top-8 inset-x-0 text-center pointer-events-none">
-               <span className="text-gold-500/30 text-lg tracking-[0.5em] font-serif font-bold uppercase">Moso Technology</span>
-            </div>
-          </motion.div>
-
-          {/* RIGHT: Content Steps */}
-          <div className="space-y-10 pl-0 lg:pl-4">
-            <div>
-               <span className="text-gold-600 dark:text-gold-400 text-sm font-bold uppercase tracking-widest mb-2 block">{t.badge}</span>
-               <h2 className="text-5xl md:text-6xl font-serif text-stone-900 dark:text-stone-100 mb-6 leading-tight">
-                 {t.title1} <br/>
-                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-rose-500">{t.title2}</span>
-               </h2>
-               <p className="text-stone-600 dark:text-stone-400 text-lg leading-relaxed max-w-lg">
-                 {t.desc}
-               </p>
-            </div>
-
-            <div className="grid gap-8">
-               {steps.map((step, idx) => (
-                 <motion.div 
-                   key={idx}
-                   initial={{ opacity: 0, x: 20 }}
-                   whileInView={{ opacity: 1, x: 0 }}
-                   viewport={{ once: true }}
-                   transition={{ delay: idx * 0.15 }}
-                   className="flex gap-5 items-start group"
-                 >
-                    {/* Icon Box */}
-                    <div className="w-14 h-14 rounded-2xl bg-stone-100 dark:bg-white/5 flex items-center justify-center text-gold-600 dark:text-gold-400 border border-stone-200 dark:border-white/10 shrink-0 mt-1 transition-colors group-hover:border-gold-500/30 group-hover:bg-gold-500/10">
-                       {step.icon}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+           {t.steps.map((step, idx) => {
+             const Icon = icons[idx];
+             return (
+               <FadeIn
+                 key={idx}
+                 delay={idx * 0.1}
+                 className="h-full"
+               >
+                 <div className="glass-card p-8 rounded-2xl text-center group hover:-translate-y-2 transition-transform duration-300 h-full">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-400 to-rose-400 mx-auto mb-6 flex items-center justify-center text-white shadow-lg group-hover:shadow-gold-500/50 transition-shadow">
+                       <Icon size={32} />
                     </div>
-                    
-                    {/* Text */}
-                    <div>
-                       <h4 className="text-xl font-serif text-stone-800 dark:text-stone-200 font-bold flex items-center gap-3">
-                         <span className="text-sm font-sans font-bold text-stone-400/60">0{idx + 1}.</span>
-                         {step.title}
-                       </h4>
-                       <p className="text-stone-500 dark:text-stone-400 mt-1 leading-relaxed">
-                         {step.desc}
-                       </p>
-                    </div>
-                 </motion.div>
-               ))}
-            </div>
-          </div>
-
+                    <h3 className="font-serif text-xl text-stone-900 dark:text-stone-100 mb-3">{step.title}</h3>
+                    <p className="text-stone-500 dark:text-stone-400 text-sm leading-relaxed">
+                      {step.desc}
+                    </p>
+                 </div>
+               </FadeIn>
+             );
+           })}
         </div>
       </div>
     </section>

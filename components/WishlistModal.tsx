@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
 import { Product } from '../types';
 import Button from './ui/Button';
+import { Language, translations } from '../utils/translations';
 
 interface WishlistModalProps {
   isOpen: boolean;
@@ -10,6 +12,7 @@ interface WishlistModalProps {
   wishlist: Product[];
   onRemove: (id: string) => void;
   onAddToCart: (product: Product) => void;
+  language?: Language;
 }
 
 const WishlistModal: React.FC<WishlistModalProps> = ({ 
@@ -17,8 +20,10 @@ const WishlistModal: React.FC<WishlistModalProps> = ({
   onClose, 
   wishlist, 
   onRemove,
-  onAddToCart 
+  onAddToCart,
+  language = 'vi'
 }) => {
+  const t = translations[language].wishlistModal;
 
   const handleShopNow = () => {
     onClose();
@@ -55,7 +60,7 @@ const WishlistModal: React.FC<WishlistModalProps> = ({
             <div className="p-6 border-b border-stone-200 dark:border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Heart className="text-rose-500" fill="currentColor" />
-                <h2 className="font-serif text-2xl text-stone-900 dark:text-stone-100">Yêu Thích ({wishlist.length})</h2>
+                <h2 className="font-serif text-2xl text-stone-900 dark:text-stone-100">{t.title} ({wishlist.length})</h2>
               </div>
               <button 
                 onClick={onClose}
@@ -73,11 +78,11 @@ const WishlistModal: React.FC<WishlistModalProps> = ({
                     <Heart size={32} className="text-stone-400 dark:text-stone-500 group-hover:text-rose-500 transition-colors duration-500" />
                   </div>
                   
-                  <h3 className="font-serif text-2xl text-stone-800 dark:text-stone-200 mb-3">Danh sách trống</h3>
-                  <p className="text-stone-500 text-sm mb-8 max-w-[250px] leading-relaxed">
-                    Bạn chưa lưu sản phẩm nào. <br/>
-                    Hãy thả tim cho món chè bạn yêu thích nhé!
-                  </p>
+                  <h3 className="font-serif text-2xl text-stone-800 dark:text-stone-200 mb-3">{t.emptyTitle}</h3>
+                  <p 
+                    className="text-stone-500 text-sm mb-8 max-w-[250px] leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: t.emptyDesc }}
+                  />
                   
                   <Button 
                     variant="primary" 
@@ -85,7 +90,7 @@ const WishlistModal: React.FC<WishlistModalProps> = ({
                     className="min-w-[200px]"
                     icon={<ArrowRight size={18} />}
                   >
-                    Xem Sản Phẩm
+                    {t.viewProductsBtn}
                   </Button>
                 </div>
               ) : (

@@ -16,10 +16,11 @@ interface SplineErrorBoundaryState {
 }
 
 // Simple Error Boundary to catch WebGL context errors
-class SplineErrorBoundary extends React.Component<SplineErrorBoundaryProps, SplineErrorBoundaryState> {
+class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, SplineErrorBoundaryState> {
+  state: SplineErrorBoundaryState = { hasError: false };
+
   constructor(props: SplineErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false };
   }
 
   static getDerivedStateFromError(_: Error): SplineErrorBoundaryState {

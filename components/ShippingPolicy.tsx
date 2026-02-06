@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Truck, Clock, MapPin, PackageSearch } from 'lucide-react';
+import FadeIn from './ui/FadeIn';
 
 interface ShippingPolicyProps {
   onBack: () => void;
@@ -18,11 +20,7 @@ const ShippingPolicy: React.FC<ShippingPolicyProps> = ({ onBack }) => {
           <span>Quay lại trang chủ</span>
         </button>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-dark-900 rounded-3xl p-8 md:p-12 border border-stone-200 dark:border-white/5 shadow-xl"
-        >
+        <FadeIn direction="up" className="bg-white dark:bg-dark-900 rounded-3xl p-8 md:p-12 border border-stone-200 dark:border-white/5 shadow-xl">
           <div className="flex items-center gap-4 mb-10">
             <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
               <Truck size={32} />
@@ -97,7 +95,7 @@ const ShippingPolicy: React.FC<ShippingPolicyProps> = ({ onBack }) => {
                </p>
             </div>
           </div>
-        </motion.div>
+        </FadeIn>
       </div>
     </div>
   );

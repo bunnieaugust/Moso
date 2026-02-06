@@ -1,3 +1,4 @@
+
 export interface Product {
   id: string;
   name: string;
@@ -36,7 +37,8 @@ export interface Testimonial {
 export interface NavItem {
   label: string;
   href: string;
-  type?: 'scroll' | 'view'; // Added type to distinguish between scroll sections and new pages
+  type?: 'scroll' | 'view' | 'dropdown'; // Added dropdown type
+  id?: string; // Added id for identifying specific menus
 }
 
 export interface OrderInfo {

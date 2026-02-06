@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { CartItem } from '../types';
 import Button from './ui/Button';
+import { Language, translations } from '../utils/translations';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -11,6 +13,7 @@ interface CartDrawerProps {
   onUpdateQty: (id: string, delta: number) => void;
   onRemove: (id: string) => void;
   onCheckout: () => void;
+  language?: Language;
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ 
@@ -19,8 +22,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   items, 
   onUpdateQty,
   onRemove,
-  onCheckout
+  onCheckout,
+  language = 'vi'
 }) => {
+  const t = translations[language].cartDrawer;
+
   // Helper to parse "189.000đ" -> 189000
   const parsePrice = (priceStr: string) => {
     return parseInt(priceStr.replace(/\./g, '').replace('đ', '')) || 0;
@@ -69,7 +75,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="p-6 border-b border-stone-200 dark:border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <ShoppingBag className="text-gold-500" />
-                <h2 className="font-serif text-2xl text-stone-900 dark:text-stone-100">Giỏ Hàng ({items.length})</h2>
+                <h2 className="font-serif text-2xl text-stone-900 dark:text-stone-100">{t.title} ({items.length})</h2>
               </div>
               <button 
                 onClick={onClose}
@@ -88,11 +94,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                     <div className="absolute inset-0 rounded-full border border-stone-200 dark:border-white/5 group-hover:border-gold-500/30 group-hover:scale-110 transition-all duration-500" />
                   </div>
                   
-                  <h3 className="font-serif text-2xl text-stone-800 dark:text-stone-200 mb-3">Giỏ Hàng Trống</h3>
-                  <p className="text-stone-500 text-sm mb-8 max-w-[250px] leading-relaxed">
-                    Chưa có sản phẩm nào được chọn. <br/>
-                    Hãy khám phá thực đơn dưỡng nhan ngay!
-                  </p>
+                  <h3 className="font-serif text-2xl text-stone-800 dark:text-stone-200 mb-3">{t.emptyTitle}</h3>
+                  <p 
+                    className="text-stone-500 text-sm mb-8 max-w-[250px] leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: t.emptyDesc }}
+                  />
                   
                   <Button 
                     variant="primary" 
@@ -100,7 +106,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                     className="min-w-[200px] shadow-lg shadow-gold-500/10"
                     icon={<ArrowRight size={18} />}
                   >
-                    Khám Phá Menu
+                    {t.exploreBtn}
                   </Button>
                 </div>
               ) : (
@@ -160,12 +166,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
             {items.length > 0 && (
               <div className="p-6 border-t border-stone-200 dark:border-white/5 bg-stone-50/80 dark:bg-dark-900/80 backdrop-blur-md">
                 <div className="flex justify-between items-center mb-6">
-                  <span className="text-stone-500 dark:text-stone-400 text-sm">Tổng cộng</span>
+                  <span className="text-stone-500 dark:text-stone-400 text-sm">{t.total}</span>
                   <div className="flex flex-col items-end">
                     <span className="text-gold-600 dark:text-gold-400 font-bold font-serif text-2xl">
                       {formatPrice(total)}
                     </span>
-                    <span className="text-stone-500 dark:text-stone-600 text-xs">Đã bao gồm thuế</span>
+                    <span className="text-stone-500 dark:text-stone-600 text-xs">{t.taxIncluded}</span>
                   </div>
                 </div>
                 <Button 
@@ -173,7 +179,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                   className="w-full py-4 text-base shadow-gold-500/20 shadow-lg"
                   onClick={onCheckout}
                 >
-                  Thanh Toán Ngay
+                  {t.checkoutBtn}
                 </Button>
               </div>
             )}

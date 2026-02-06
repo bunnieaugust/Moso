@@ -1,15 +1,18 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Heart, ShoppingBag, SlidersHorizontal, LayoutGrid, Gift, ChevronLeft, ChevronRight, ChevronDown, Sparkles, X, ArrowDown, MousePointer2 } from 'lucide-react';
 import { Product } from '../types';
 import { products as initialProducts } from './ProductShowcase';
 import Button from './ui/Button';
+import { Language, translations } from '../utils/translations';
 
 interface ShopPageProps {
   onProductSelect: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   onToggleWishlist: (product: Product) => void;
   wishlistItems: Product[];
+  language?: Language;
 }
 
 // --- COMPONENT: LUXURY GIFT GUIDE SHOWCASE (HERO SECTION) ---
@@ -17,8 +20,9 @@ const GiftShowcase: React.FC<{
   products: Product[], 
   onSelect: (p: Product) => void,
   onAddToCart: (p: Product) => void,
-  onScrollDown: () => void
-}> = ({ products, onSelect, onAddToCart, onScrollDown }) => {
+  onScrollDown: () => void,
+  t: any
+}> = ({ products, onSelect, onAddToCart, onScrollDown, t }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextProduct = () => {
@@ -79,10 +83,10 @@ const GiftShowcase: React.FC<{
       <div className="absolute top-[18%] md:top-[15%] left-0 right-0 flex flex-col items-center z-30 pointer-events-none transition-all duration-700">
          <Sparkles className="text-gold-400 w-3 h-3 mb-4 animate-pulse" />
          <span className="text-gold-500/50 font-sans text-[10px] tracking-[0.3em] uppercase mb-2">
-            Seasonal Collection
+            {t.heroSubtitle}
          </span>
          <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-[0.1em] text-transparent bg-clip-text bg-gradient-to-b from-stone-200 to-stone-700 drop-shadow-2xl font-serif">
-            Gift Selection
+            {t.heroTitle}
          </h1>
          <span className="mt-3 font-mono text-gold-500/30 text-[10px] tracking-widest border border-gold-500/10 px-3 py-1 rounded-full">
             0{currentIndex + 1} / 0{products.length}
@@ -259,7 +263,7 @@ const GiftShowcase: React.FC<{
                 className="px-10 py-3 shadow-[0_0_30px_rgba(212,138,39,0.15)] text-xs tracking-[0.2em] uppercase bg-gold-600 hover:bg-gold-500 border-none min-w-[180px]"
                 onClick={() => onAddToCart(currentProduct)}
             >
-                Shop Now
+                {t.shopNow}
             </Button>
             
             {/* Centered Scroll Indicator */}
@@ -268,7 +272,7 @@ const GiftShowcase: React.FC<{
               onClick={onScrollDown}
             >
                <span className="text-[10px] tracking-[0.3em] uppercase text-stone-400 group-hover:text-gold-400 transition-colors">
-                  Khám phá bộ sưu tập
+                  {t.viewAllBtn}
                </span>
                <div className="relative w-px h-12 bg-white/10 overflow-hidden">
                   <motion.div 
@@ -291,18 +295,32 @@ const ShopPage: React.FC<ShopPageProps> = ({
   onProductSelect, 
   onAddToCart, 
   onToggleWishlist,
-  wishlistItems 
+  wishlistItems,
+  language = 'vi'
 }) => {
   const [filter, setFilter] = useState<'all' | 'tea' | 'gift'>('all');
   const [sort, setSort] = useState<'newest' | 'price-asc' | 'price-desc'>('newest');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(initialProducts);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  const t = translations[language].shopPage;
+  const tProducts = translations[language].products;
+
+  // Translate products for display
+  const translatedProducts = initialProducts.map(p => {
+    const translatedItem = (tProducts.items as any)[p.id];
+    return {
+      ...p,
+      name: translatedItem?.name || p.name,
+      description: translatedItem?.desc || p.description
+    };
+  });
+
   // Helper for price
   const getPrice = (p: string) => parseInt(p.replace(/\D/g, ''));
 
   useEffect(() => {
-    let result = [...initialProducts];
+    let result = [...translatedProducts];
     if (filter !== 'all') {
       result = result.filter(p => p.category === filter);
     }
@@ -312,7 +330,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
       result.sort((a, b) => getPrice(b.price) - getPrice(a.price));
     }
     setFilteredProducts(result);
-  }, [filter, sort]);
+  }, [filter, sort, language]); // Added language to dependencies
 
   const scrollToGrid = () => {
     const grid = document.getElementById('product-grid');
@@ -326,9 +344,9 @@ const ShopPage: React.FC<ShopPageProps> = ({
   };
 
   const categories = [
-    { id: 'all', label: 'Tất cả' },
-    { id: 'tea', label: 'Chè Dưỡng Nhan' },
-    { id: 'gift', label: 'Set Quà Tặng' },
+    { id: 'all', label: t.catAll },
+    { id: 'tea', label: t.catTea },
+    { id: 'gift', label: t.catGift },
   ];
 
   return (
@@ -337,10 +355,11 @@ const ShopPage: React.FC<ShopPageProps> = ({
       {/* 1. GIFT GUIDE HERO SECTION */}
       <section className="relative z-10">
          <GiftShowcase 
-            products={initialProducts} 
+            products={translatedProducts} 
             onSelect={onProductSelect} 
             onAddToCart={(p) => onAddToCart(p)}
             onScrollDown={scrollToGrid}
+            t={t}
          />
       </section>
 
@@ -351,7 +370,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
          <div className="sticky top-20 md:top-24 z-30 bg-stone-50/95 dark:bg-dark-950/95 backdrop-blur-md border-b border-stone-200 dark:border-white/5 py-4 mb-12">
             <div className="container mx-auto px-6 md:px-40 flex justify-between items-center">
                <h2 className="font-serif text-2xl md:text-3xl text-stone-900 dark:text-stone-100">
-                  Bộ Sưu Tập Moso
+                  {t.collectionTitle}
                </h2>
                
                <div className="flex gap-2">
@@ -370,16 +389,62 @@ const ShopPage: React.FC<ShopPageProps> = ({
                  </button>
                </div>
             </div>
+            
+            {/* Mobile Collapsible Filter Panel */}
+            <AnimatePresence>
+              {isFilterOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="md:hidden overflow-hidden bg-stone-50 dark:bg-dark-900 border-b border-stone-200 dark:border-white/5"
+                >
+                  <div className="container mx-auto px-6 py-6 space-y-6">
+                     <div>
+                        <h3 className="font-serif text-sm text-stone-500 dark:text-stone-400 mb-3 uppercase tracking-wider">{t.categories}</h3>
+                        <div className="flex flex-wrap gap-2">
+                           {categories.map((cat) => (
+                             <button
+                               key={cat.id}
+                               onClick={() => setFilter(cat.id as any)}
+                               className={`text-sm px-4 py-2 rounded-full border transition-all ${
+                                 filter === cat.id 
+                                   ? 'bg-stone-900 dark:bg-white text-white dark:text-stone-900 border-stone-900 dark:border-white' 
+                                   : 'bg-transparent border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300'
+                               }`}
+                             >
+                               {cat.label}
+                             </button>
+                           ))}
+                        </div>
+                     </div>
+                     <div>
+                        <h3 className="font-serif text-sm text-stone-500 dark:text-stone-400 mb-3 uppercase tracking-wider">{t.sort}</h3>
+                        <select 
+                          value={sort}
+                          onChange={(e) => setSort(e.target.value as any)}
+                          className="w-full bg-white dark:bg-white/5 border border-stone-200 dark:border-white/10 text-sm text-stone-900 dark:text-stone-100 outline-none rounded-lg px-4 py-3 appearance-none"
+                        >
+                          <option value="newest">{t.sortNewest}</option>
+                          <option value="price-asc">{t.sortPriceAsc}</option>
+                          <option value="price-desc">{t.sortPriceDesc}</option>
+                        </select>
+                     </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
          </div>
 
          <div className="container mx-auto px-6 md:px-40">
             <div className="flex flex-col md:flex-row gap-12 lg:gap-16">
                
-               {/* Sidebar Filters */}
-               <aside className={`w-full md:w-64 flex-shrink-0 ${isFilterOpen ? 'block' : 'hidden'} md:block`}>
+               {/* Sidebar Filters (Desktop Only) */}
+               <aside className="hidden md:block w-64 flex-shrink-0">
                   <div className="sticky top-40 space-y-10">
                      <div>
-                        <h3 className="font-serif text-lg text-stone-900 dark:text-stone-100 mb-4 pb-2 border-b border-stone-200 dark:border-white/5">Danh Mục</h3>
+                        <h3 className="font-serif text-lg text-stone-900 dark:text-stone-100 mb-4 pb-2 border-b border-stone-200 dark:border-white/5">{t.categories}</h3>
                         <ul className="space-y-2">
                            {categories.map((cat) => (
                              <li key={cat.id}>
@@ -399,15 +464,15 @@ const ShopPage: React.FC<ShopPageProps> = ({
                      </div>
 
                      <div>
-                        <h3 className="font-serif text-lg text-stone-900 dark:text-stone-100 mb-4 pb-2 border-b border-stone-200 dark:border-white/5">Sắp Xếp</h3>
+                        <h3 className="font-serif text-lg text-stone-900 dark:text-stone-100 mb-4 pb-2 border-b border-stone-200 dark:border-white/5">{t.sort}</h3>
                         <select 
                           value={sort}
                           onChange={(e) => setSort(e.target.value as any)}
                           className="w-full bg-transparent text-sm text-stone-600 dark:text-stone-400 outline-none cursor-pointer py-2 hover:text-gold-600 transition-colors border border-stone-200 dark:border-white/10 rounded-lg px-3"
                         >
-                          <option value="newest" className="bg-white dark:bg-dark-900">Mới nhất</option>
-                          <option value="price-asc" className="bg-white dark:bg-dark-900">Giá: Thấp đến Cao</option>
-                          <option value="price-desc" className="bg-white dark:bg-dark-900">Giá: Cao đến Thấp</option>
+                          <option value="newest" className="bg-white dark:bg-dark-900">{t.sortNewest}</option>
+                          <option value="price-asc" className="bg-white dark:bg-dark-900">{t.sortPriceAsc}</option>
+                          <option value="price-desc" className="bg-white dark:bg-dark-900">{t.sortPriceDesc}</option>
                         </select>
                      </div>
                   </div>
@@ -462,7 +527,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
                                   }}
                                   className="w-full py-3 bg-white text-stone-900 font-medium text-xs uppercase tracking-wider shadow-lg hover:bg-gold-500 hover:text-white transition-colors rounded-lg flex items-center justify-center gap-2 translate-y-4 group-hover:translate-y-0 duration-300"
                                >
-                                  <ShoppingBag size={14} /> Thêm vào giỏ
+                                  <ShoppingBag size={14} /> {t.addToCart}
                                </button>
                             </div>
                           </div>
@@ -486,9 +551,9 @@ const ShopPage: React.FC<ShopPageProps> = ({
 
                   {filteredProducts.length === 0 && (
                      <div className="text-center py-20 border border-dashed border-stone-200 dark:border-white/10 rounded-xl">
-                        <p className="text-stone-500 dark:text-stone-400 mb-4">Không tìm thấy sản phẩm phù hợp.</p>
+                        <p className="text-stone-500 dark:text-stone-400 mb-4">{t.empty}</p>
                         <Button variant="outline" onClick={() => setFilter('all')}>
-                          Xem tất cả sản phẩm
+                          {t.viewAllBtn}
                         </Button>
                      </div>
                   )}

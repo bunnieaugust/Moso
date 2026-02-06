@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Flame, Clock, Zap, AlertTriangle, Thermometer } from 'lucide-react';
+import FadeIn from './ui/FadeIn';
 
 interface UsageGuideProps {
   onBack: () => void;
@@ -41,11 +43,7 @@ const UsageGuide: React.FC<UsageGuideProps> = ({ onBack }) => {
           <span>Quay lại trang chủ</span>
         </button>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
+        <FadeIn direction="up" className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mb-4">
             Hướng Dẫn Sử Dụng <br />
             <span className="text-gold-500 italic">Chén Tự Sôi Moso</span>
@@ -54,16 +52,15 @@ const UsageGuide: React.FC<UsageGuideProps> = ({ onBack }) => {
             Để đạt được hương vị thơm ngon và giữ trọn vẹn dưỡng chất quý giá, 
             vui lòng thực hiện đúng quy trình 4 bước chuẩn spa dưới đây.
           </p>
-        </motion.div>
+        </FadeIn>
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <div className="space-y-6">
              {steps.map((step, idx) => (
-               <motion.div 
+               <FadeIn
                  key={idx}
-                 initial={{ opacity: 0, x: -20 }}
-                 whileInView={{ opacity: 1, x: 0 }}
-                 transition={{ delay: idx * 0.1 }}
+                 direction="left"
+                 delay={idx * 0.1}
                  className="flex gap-4 p-6 bg-white dark:bg-white/5 rounded-2xl border border-stone-100 dark:border-white/5 hover:border-gold-500/30 transition-colors shadow-lg shadow-stone-200/50 dark:shadow-none"
                >
                  <div className="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-gold-500/30">
@@ -77,11 +74,11 @@ const UsageGuide: React.FC<UsageGuideProps> = ({ onBack }) => {
                      {step.desc}
                    </p>
                  </div>
-               </motion.div>
+               </FadeIn>
              ))}
           </div>
 
-          <div className="bg-stone-900 rounded-3xl overflow-hidden relative min-h-[400px]">
+          <FadeIn direction="right" delay={0.2} className="bg-stone-900 rounded-3xl overflow-hidden relative min-h-[400px]">
              {/* Simulated Illustration Graphic */}
              <div className="absolute inset-0 bg-gradient-to-br from-stone-800 to-black p-8 flex flex-col items-center justify-center text-center">
                 <div className="w-48 h-48 rounded-full border-4 border-gold-500/20 flex items-center justify-center relative mb-8 animate-pulse">
@@ -97,14 +94,10 @@ const UsageGuide: React.FC<UsageGuideProps> = ({ onBack }) => {
                   Giúp chè chín đều, hạt sen bở tơi mà không bị nát, giữ nguyên Vitamin và Collagen.
                 </p>
              </div>
-          </div>
+          </FadeIn>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl p-8"
-        >
+        <FadeIn direction="up" delay={0.3} className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl p-8">
           <div className="flex items-center gap-3 mb-4">
              <AlertTriangle className="text-rose-500" size={24} />
              <h3 className="font-serif text-2xl text-stone-900 dark:text-stone-100">Lưu Ý Quan Trọng</h3>
@@ -120,7 +113,7 @@ const UsageGuide: React.FC<UsageGuideProps> = ({ onBack }) => {
                <li>Nếu muốn ăn lạnh: Ủ nóng xong, để nguội và thêm đá. (Quy trình làm nóng giúp kích hoạt hương vị tốt hơn là ăn lạnh ngay từ đầu).</li>
              </ul>
           </div>
-        </motion.div>
+        </FadeIn>
       </div>
     </div>
   );

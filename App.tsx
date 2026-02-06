@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
@@ -19,6 +20,7 @@ import OrderDetailsModal from './components/OrderDetailsModal';
 import OrderLookupModal from './components/OrderLookupModal';
 import WishlistModal from './components/WishlistModal';
 import ShopPage from './components/ShopPage'; // Import ShopPage
+import CustomCursor from './components/ui/CustomCursor'; // Import CustomCursor
 
 // New Pages
 import ReturnPolicy from './components/ReturnPolicy';
@@ -27,6 +29,10 @@ import ShippingPolicy from './components/ShippingPolicy';
 import ContactPage from './components/ContactPage';
 import AboutPage from './components/AboutPage'; // Import AboutPage
 import RegisterPage from './components/RegisterPage'; // Import RegisterPage
+import WaitlistPage from './components/WaitlistPage'; // Import WaitlistPage
+import FAQPage from './components/FAQPage'; // Import FAQPage
+import RewardsPage from './components/RewardsPage'; // Import RewardsPage
+import BlogPage from './components/BlogPage'; // Import BlogPage
 
 import { CartItem, Product, User, Order, OrderInfo } from './types';
 import { Language, translations } from './utils/translations'; // Import Language type
@@ -62,7 +68,7 @@ const INITIAL_DB_ORDERS: Order[] = [
 ];
 
 // Define possible views including new pages
-type ViewType = 'home' | 'shop' | 'about' | 'product' | 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page' | 'register';
+type ViewType = 'home' | 'shop' | 'about' | 'product' | 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page' | 'register' | 'waitlist' | 'faq' | 'rewards' | 'blog';
 
 function App() {
   // State
@@ -316,10 +322,11 @@ function App() {
             onAddToCart={(product) => addToCart(product, 1)}
             onToggleWishlist={toggleWishlist}
             wishlistItems={wishlistItems}
+            language={language} // Pass language
           />
         );
       case 'about':
-        return <AboutPage onNavigate={(id) => handleNavClick(id, 'view')} />;
+        return <AboutPage onNavigate={(id) => handleNavClick(id, 'view')} language={language} />;
       case 'product':
         return (
           <ProductDetailPage 
@@ -331,6 +338,7 @@ function App() {
             onProductSelect={handleProductSelect}
             isWishlisted={wishlistItems.some(p => p.id === selectedProduct?.id)}
             onToggleWishlist={toggleWishlist}
+            language={language} // Pass language
           />
         );
       case 'return-policy':
@@ -340,7 +348,26 @@ function App() {
       case 'shipping-policy':
         return <ShippingPolicy onBack={() => setView('home')} />;
       case 'contact-page':
-        return <ContactPage onBack={() => setView('home')} />;
+        return <ContactPage onBack={() => setView('home')} language={language} />;
+      case 'faq':
+        return <FAQPage onBack={() => setView('home')} language={language} />;
+      case 'rewards': 
+        return (
+          <RewardsPage 
+            onJoin={() => {
+              setView('register');
+              window.scrollTo(0, 0);
+            }} 
+            language={language} 
+          />
+        );
+      case 'blog': // New View
+        return (
+          <BlogPage 
+            onNavigate={(id) => handleNavClick(id, 'view')}
+            language={language}
+          />
+        );
       case 'register':
         return (
           <RegisterPage 
@@ -352,8 +379,11 @@ function App() {
               handleLogin(name, email);
               setView('home');
             }}
+            language={language} // Pass language
           />
         );
+      case 'waitlist':
+        return <WaitlistPage onBack={() => setView('home')} language={language} />;
       case 'home':
       default:
         return (
@@ -369,7 +399,12 @@ function App() {
               </p>
             </section>
 
-            <ProductShowcase onProductSelect={handleProductSelect} language={language} />
+            <ProductShowcase 
+              onProductSelect={handleProductSelect} 
+              language={language} 
+              onViewAll={() => handleNavClick('shop', 'view')} 
+              onAddToCart={(product) => addToCart(product, 1)} // Passed onAddToCart
+            />
             <TechShowcase language={language} />
             <Testimonials language={language} />
             <Contact language={language} />
@@ -381,6 +416,8 @@ function App() {
   // REMOVED bg-stone-50 dark:bg-dark-950 from this outer div to avoid hiding the Footer
   return (
     <div className="min-h-screen text-stone-800 dark:text-stone-200 selection:bg-rose-500/30 transition-colors duration-300 flex flex-col">
+      <CustomCursor /> {/* Custom Cursor Added Here */}
+      
       <Header 
         cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
         wishlistCount={wishlistItems.length}
@@ -414,7 +451,7 @@ function App() {
       {/* Footer sits outside the main flow on desktop (fixed), behaving like a reveal */}
       <Footer onNavigate={handleFooterNavigate} language={language} />
 
-      {/* Overlays */}
+      {/* Overlays - Now Passing Language Prop */}
       <CartDrawer 
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)} 
@@ -422,6 +459,7 @@ function App() {
         onUpdateQty={updateQty}
         onRemove={removeFromCart}
         onCheckout={handleCheckoutInit}
+        language={language}
       />
 
       <WishlistModal 
@@ -433,6 +471,7 @@ function App() {
           addToCart(product);
           setIsWishlistOpen(false);
         }}
+        language={language}
       />
       
       <AuthModal 
@@ -443,6 +482,7 @@ function App() {
           setIsAuthOpen(false);
           handleAuthAction('register');
         }}
+        language={language}
       />
 
       {/* Replaced Modal with Page View, kept Checkout and other modals */}
@@ -476,6 +516,7 @@ function App() {
         isOpen={isLookupOpen}
         onClose={() => setIsLookupOpen(false)}
         onLookup={handleLookupOrder}
+        language={language}
       />
 
       <OrderDetailsModal 
