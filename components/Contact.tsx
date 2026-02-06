@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import Button from './ui/Button';
 import ContactModal from './ContactModal';
+import { Language, translations } from '../utils/translations';
 
-const Contact: React.FC = () => {
+interface ContactProps {
+  language?: Language;
+}
+
+const Contact: React.FC<ContactProps> = ({ language = 'vi' }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const t = translations[language].contact;
 
   return (
     <>
@@ -21,30 +27,31 @@ const Contact: React.FC = () => {
         <div className="container mx-auto px-6 md:px-40 relative z-10 text-center">
           <div className="max-w-3xl mx-auto glass-panel p-12 rounded-[2rem] border border-white/10 shadow-2xl">
             <h2 className="font-serif text-4xl md:text-5xl text-stone-100 mb-6">
-              Bạn Đã Sẵn Sàng <br/>
-              <span className="text-gold-400 italic">Yêu Chiều Bản Thân?</span>
+              {t.title1} <br/>
+              <span className="text-gold-400 italic" dangerouslySetInnerHTML={{ __html: t.title2 }} />
             </h2>
-            <p className="text-stone-300 text-lg mb-8 font-light">
-              Đăng ký ngay để nhận ưu đãi <span className="text-rose-400 font-semibold">-20%</span> cho đơn hàng đầu tiên 
-              và trở thành thành viên VIP của cộng đồng Moso.
-            </p>
+            <p className="text-stone-300 text-lg mb-8 font-light" dangerouslySetInnerHTML={{ __html: t.desc }} />
             
             <Button 
               variant="primary" 
               className="px-10 py-4 text-lg"
               onClick={() => setIsModalOpen(true)}
             >
-              Nhận Ưu Đãi Ngay
+              {t.cta}
             </Button>
             
             <p className="mt-6 text-stone-500 text-xs uppercase tracking-widest">
-              * Số lượng ưu đãi có hạn trong tháng này
+              {t.note}
             </p>
           </div>
         </div>
       </section>
 
-      <ContactModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ContactModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        title={language === 'vi' ? "Đăng Ký Nhận Ưu Đãi -20%" : "Sign Up For 20% OFF"} 
+      />
     </>
   );
 };

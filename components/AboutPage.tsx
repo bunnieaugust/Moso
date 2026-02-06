@@ -182,7 +182,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                <FadeInSection>
                   <span className="text-gold-600 dark:text-gold-400 uppercase tracking-widest text-xs font-bold mb-4 block">Quy Trình</span>
                   <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mb-6">
-                    Từ Nông Trại <br/> Đến Bàn Trà
+                    Từ Nông Trại <br/> Đến Chén Ngọc
                   </h2>
                   <div className="space-y-8 relative">
                      {/* Vertical Line */}

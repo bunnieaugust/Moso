@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ShoppingBag, User as UserIcon, Sun, Moon, PackageSearch, Heart } from 'lucide-react';
+import { Menu, X, ShoppingBag, User as UserIcon, Sun, Moon, PackageSearch, Heart, Globe } from 'lucide-react';
 import { NavItem, User } from '../types';
 import Button from './ui/Button';
+import AuthPopover from './AuthPopover';
+import { Language, translations } from '../utils/translations';
 
 interface HeaderProps {
   cartCount: number;
-  wishlistCount: number; // Added prop
+  wishlistCount: number;
   onOpenCart: () => void;
-  onOpenWishlist: () => void; // Added prop
-  onOpenAuth: () => void;
+  onOpenWishlist: () => void;
+  onOpenAuth: (view?: 'login' | 'register') => void;
   onOpenLookup: () => void;
   user: User | null;
+  onLogout: () => void;
   isDark: boolean;
   toggleTheme: () => void;
-  onNavClick?: (sectionId: string, type?: 'scroll' | 'view') => void; // Updated signature
+  onNavClick?: (sectionId: string, type?: 'scroll' | 'view') => void;
+  onViewOrderHistory: () => void;
+  language: Language;
+  toggleLanguage: () => void;
 }
-
-// Updated NavItems: Replaced 'Technology' with 'Contact' (view type)
-const navItems: NavItem[] = [
-  { label: 'Cửa Hàng', href: 'shop', type: 'view' }, // Shop Page
-  { label: 'Về Moso', href: 'about', type: 'view' }, // About Page
-  { label: 'Liên Hệ', href: 'contact-page', type: 'view' }, // Contact Page (Replaces Technology)
-  { label: 'Đánh Giá', href: 'testimonials', type: 'scroll' },
-];
 
 const Header: React.FC<HeaderProps> = ({ 
   cartCount, 
@@ -32,12 +30,28 @@ const Header: React.FC<HeaderProps> = ({
   onOpenAuth, 
   onOpenLookup, 
   user, 
+  onLogout,
   isDark, 
   toggleTheme,
-  onNavClick 
+  onNavClick,
+  onViewOrderHistory,
+  language,
+  toggleLanguage
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthHovered, setIsAuthHovered] = useState(false);
+  // Using a timeout to prevent flickering when moving mouse between button and popover
+  const [hoverTimeout, setHoverTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+
+  const t = translations[language].nav;
+
+  const navItems: NavItem[] = [
+    { label: t.shop, href: 'shop', type: 'view' },
+    { label: t.about, href: 'about', type: 'view' },
+    { label: t.contact, href: 'contact-page', type: 'view' },
+    { label: t.reviews, href: 'testimonials', type: 'scroll' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,17 +61,17 @@ const Header: React.FC<HeaderProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMobileMenuOpen]);
+  const handleMouseEnter = () => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    setIsAuthHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setIsAuthHovered(false);
+    }, 200); // 200ms delay to allow moving to popover
+    setHoverTimeout(timeout);
+  };
 
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, item: NavItem) => {
     e.preventDefault();
@@ -66,7 +80,6 @@ const Header: React.FC<HeaderProps> = ({
     if (onNavClick) {
       onNavClick(item.href, item.type);
     } else {
-      // Fallback default behavior
       if (item.type === 'scroll' || !item.type) {
          const element = document.getElementById(item.href);
          if (element) {
@@ -135,6 +148,16 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-3">
+             {/* Language Toggle */}
+             <button
+               onClick={toggleLanguage}
+               className="flex items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300 transition-colors p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full text-xs font-bold"
+               title={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+             >
+               <Globe size={18} />
+               {language === 'vi' ? 'VN' : 'EN'}
+             </button>
+
              {/* Theme Toggle */}
              <button
               onClick={toggleTheme}
@@ -148,7 +171,7 @@ const Header: React.FC<HeaderProps> = ({
              <button
               onClick={onOpenLookup}
               className="text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300 transition-colors p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full"
-              title="Tra cứu đơn hàng"
+              title={t.lookup}
              >
                <PackageSearch size={20} />
              </button>
@@ -157,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({
              <button 
                className="text-stone-600 dark:text-stone-300 hover:text-rose-500 transition-colors relative p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full group"
                onClick={onOpenWishlist}
-               title="Yêu thích"
+               title={t.wishlist}
              >
                <Heart size={20} className={`group-hover:scale-110 transition-transform ${wishlistCount > 0 ? 'fill-rose-500 text-rose-500' : ''}`} />
                {wishlistCount > 0 && (
@@ -165,24 +188,9 @@ const Header: React.FC<HeaderProps> = ({
                )}
              </button>
 
-             {user ? (
-                <div className="flex items-center gap-2 text-stone-600 dark:text-stone-300 cursor-pointer hover:text-gold-600 dark:hover:text-gold-300 transition-colors" onClick={onOpenAuth}>
-                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-200 dark:from-stone-800 to-stone-100 dark:to-stone-700 flex items-center justify-center border border-black/5 dark:border-white/10">
-                      <span className="font-serif font-bold text-gold-500 dark:text-gold-400">{user.name.charAt(0)}</span>
-                   </div>
-                </div>
-             ) : (
-                <button 
-                  onClick={onOpenAuth}
-                  className="text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300 transition-colors p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full"
-                  title="Đăng nhập / Đăng ký"
-                >
-                  <UserIcon size={20} />
-                </button>
-             )}
-
+             {/* Cart Icon */}
              <button 
-               className="text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300 transition-colors relative p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full group"
+               className="text-stone-600 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-300 transition-colors relative p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full group mr-2"
                onClick={onOpenCart}
                title="Giỏ hàng"
              >
@@ -194,17 +202,65 @@ const Header: React.FC<HeaderProps> = ({
                )}
              </button>
 
-             <Button 
-               variant="primary" 
-               className="!py-2 !px-5 text-xs ml-2" 
-               onClick={(e) => { e.preventDefault(); if(onNavClick) onNavClick('shop', 'view'); }}
+             {/* User Login Area with Popover */}
+             <div 
+               className="relative"
+               onMouseEnter={handleMouseEnter}
+               onMouseLeave={handleMouseLeave}
              >
-               Đặt Hàng
-             </Button>
+               {user ? (
+                  <div 
+                    className="flex items-center gap-2 text-stone-600 dark:text-stone-300 cursor-pointer hover:text-gold-600 dark:hover:text-gold-300 transition-colors pl-2 border-l border-stone-200 dark:border-white/10" 
+                    onClick={() => onViewOrderHistory()}
+                  >
+                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-200 dark:from-stone-800 to-stone-100 dark:to-stone-700 flex items-center justify-center border border-black/5 dark:border-white/10 shadow-sm">
+                        <span className="font-serif font-bold text-gold-500 dark:text-gold-400">{user.name.charAt(0)}</span>
+                     </div>
+                  </div>
+               ) : (
+                  <Button 
+                     variant="primary" 
+                     className="!py-2.5 !px-6 text-xs ml-2 flex items-center gap-2 shadow-lg" 
+                     onClick={() => onOpenAuth('login')}
+                     icon={<UserIcon size={16} />}
+                  >
+                     {t.login}
+                  </Button>
+               )}
+
+               {/* Auth Popover */}
+               <AuthPopover 
+                 isVisible={isAuthHovered}
+                 user={user}
+                 onLogin={() => {
+                   setIsAuthHovered(false);
+                   onOpenAuth('login');
+                 }}
+                 onRegister={() => {
+                   setIsAuthHovered(false);
+                   onOpenAuth('register');
+                 }}
+                 onLogout={() => {
+                   setIsAuthHovered(false);
+                   onLogout();
+                 }}
+                 onViewHistory={() => {
+                   setIsAuthHovered(false);
+                   onViewOrderHistory();
+                 }}
+               />
+             </div>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-4 md:hidden relative z-50">
+             {/* Mobile Language Toggle */}
+             <button
+               onClick={toggleLanguage}
+               className="text-stone-600 dark:text-stone-300 font-bold text-xs"
+             >
+               {language === 'vi' ? 'VN' : 'EN'}
+             </button>
              <button
               onClick={toggleTheme}
               className="text-stone-600 dark:text-stone-300"
@@ -247,26 +303,35 @@ const Header: React.FC<HeaderProps> = ({
         ))}
         <div className="flex flex-col gap-4 mt-4 w-64">
            <Button variant="ghost" onClick={() => { setIsMobileMenuOpen(false); onOpenLookup(); }} icon={<PackageSearch size={16}/>}>
-             Tra cứu đơn hàng
+             {t.lookup}
            </Button>
            <Button variant="ghost" onClick={() => { setIsMobileMenuOpen(false); onOpenWishlist(); }} icon={<Heart size={16}/>}>
-             Sản phẩm yêu thích ({wishlistCount})
-           </Button>
-           <Button variant="ghost" onClick={() => { setIsMobileMenuOpen(false); onOpenAuth(); }}>
-             {user ? 'Tài Khoản' : 'Đăng Nhập'}
+             {t.wishlist} ({wishlistCount})
            </Button>
         </div>
         <Button 
           variant="primary" 
-          className="mt-4"
+          className="mt-4 w-64"
           onClick={(e) => {
              e.preventDefault(); 
              setIsMobileMenuOpen(false);
-             if(onNavClick) onNavClick('shop', 'view');
+             if (user) onViewOrderHistory(); else onOpenAuth('login');
           }}
+          icon={<UserIcon size={18} />}
         >
-          Đặt Hàng Ngay
+          {user ? `${t.welcome}, ${user.name}` : t.login}
         </Button>
+        {user && (
+          <button 
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              onLogout();
+            }}
+            className="text-sm text-stone-500 hover:text-rose-500"
+          >
+            {t.logout}
+          </button>
+        )}
       </div>
     </header>
   );

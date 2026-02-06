@@ -1,15 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Star } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Product } from '../types';
+import { Language, translations } from '../utils/translations';
 
+// KEEP ORIGINAL DATA STRUCTURE BUT EXPORT IT SO OTHER COMPONENTS CAN USE IT
+// The actual text displayed will be overridden by the translation map inside the component
 export const products: Product[] = [
   {
     id: '1',
     name: 'Chè Hồng Hạo',
     description: 'Tinh chất hoa hồng, táo đỏ và long nhãn. Giúp hoạt huyết, đẹp da và điều hòa nội tiết cho phái đẹp.',
     price: '189.000đ',
-    // Cập nhật ảnh trà đỏ/hồng mới (ảnh cũ bị lỗi)
     image: 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?q=80&w=800&auto=format&fit=crop', 
     colSpan: 'md:col-span-2',
     rowSpan: 'md:row-span-2',
@@ -23,7 +25,6 @@ export const products: Product[] = [
     name: 'Chè Cúc Vàng',
     description: 'Cúc hoa vàng và kỷ tử. Thanh can, giải nhiệt và giúp sáng mắt, ngủ sâu.',
     price: '155.000đ',
-    // Cập nhật ảnh trà hoa cúc
     image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?q=80&w=800&auto=format&fit=crop',
     colSpan: 'md:col-span-1',
     rowSpan: 'md:row-span-1',
@@ -37,7 +38,6 @@ export const products: Product[] = [
     name: 'Chè Đông Trùng',
     description: 'Đông trùng hạ thảo và đẳng sâm. Phục hồi thể lực, tăng sức bền và bồi bổ khí huyết.',
     price: '299.000đ',
-    // Cập nhật ảnh chè/súp đậm màu
     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=800&auto=format&fit=crop',
     colSpan: 'md:col-span-1',
     rowSpan: 'md:row-span-1',
@@ -51,7 +51,6 @@ export const products: Product[] = [
     name: 'Bộ Quà Tặng Ngũ Hành',
     description: 'Bộ sưu tập đầy đủ 5 vị chè dưỡng nhan tự sôi: Nhân Sâm, Đông Trùng, Cúc Vàng, Hồng Hạo, Hạt Sen.',
     price: '1.250.000đ',
-    // Cập nhật ảnh hộp quà
     image: 'https://images.unsplash.com/photo-1584589167171-541ce45f1eea?q=80&w=800&auto=format&fit=crop',
     colSpan: 'md:col-span-2',
     rowSpan: 'md:row-span-1',
@@ -64,9 +63,10 @@ export const products: Product[] = [
 
 interface ProductShowcaseProps {
   onProductSelect: (product: Product) => void;
+  language?: Language;
 }
 
-const ProductCard: React.FC<{ product: Product; onClick: () => void }> = ({ product, onClick }) => {
+const ProductCard: React.FC<{ product: Product; onClick: () => void; viewDetailText: string }> = ({ product, onClick, viewDetailText }) => {
   const itemVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 100, damping: 20 } }
@@ -113,7 +113,7 @@ const ProductCard: React.FC<{ product: Product; onClick: () => void }> = ({ prod
           <div className="flex items-center justify-between border-t border-white/20 dark:border-white/10 pt-2 md:pt-4 md:opacity-0 group-hover:opacity-100 transition-all duration-500 md:delay-100">
             <span className="text-sm md:text-xl font-medium text-gold-300 dark:text-gold-400">{product.price}</span>
             <button className="hidden md:block text-xs uppercase tracking-wider text-stone-300 hover:text-white underline decoration-gold-500/50 hover:decoration-gold-500 underline-offset-4">
-              Xem chi tiết
+              {viewDetailText}
             </button>
           </div>
         </div>
@@ -122,7 +122,7 @@ const ProductCard: React.FC<{ product: Product; onClick: () => void }> = ({ prod
   );
 };
 
-const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect }) => {
+const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect, language = 'vi' }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -132,6 +132,19 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect }) =>
       }
     }
   };
+
+  const t = translations[language].products;
+
+  // Merge translation with products
+  const displayProducts = products.map(p => {
+    // Type assertion to access dynamic keys
+    const translatedItem = (t.items as any)[p.id];
+    return {
+      ...p,
+      name: translatedItem?.name || p.name,
+      description: translatedItem?.desc || p.description
+    };
+  });
 
   return (
     <section id="products" className="py-16 md:py-24 bg-white dark:bg-dark-900 relative transition-colors duration-300">
@@ -144,11 +157,10 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect }) =>
           className="text-center max-w-2xl mx-auto mb-10 md:mb-16"
         >
           <h2 className="font-serif text-3xl md:text-5xl text-stone-900 dark:text-stone-100 mb-4">
-            Bộ Sưu Tập <span className="text-gradient-gold">Chè Dưỡng Nhan</span>
+            {t.titlePrefix} <span className="text-gradient-gold">{t.titleSuffix}</span>
           </h2>
           <p className="text-stone-600 dark:text-stone-400 text-sm md:text-base">
-            Sự hòa quyện giữa thảo mộc cung đình và công nghệ chế biến hiện đại. 
-            Mỗi chén chè là một liệu pháp chăm sóc sức khỏe và sắc đẹp.
+            {t.subtitle}
           </p>
         </motion.div>
 
@@ -159,11 +171,12 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ onProductSelect }) =>
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-4 gap-3 md:gap-4 auto-rows-[220px] md:auto-rows-[300px]"
         >
-          {products.map((product) => (
+          {displayProducts.map((product) => (
             <ProductCard 
               key={product.id} 
               product={product} 
               onClick={() => onProductSelect(product)}
+              viewDetailText={t.viewDetail}
             />
           ))}
         </motion.div>

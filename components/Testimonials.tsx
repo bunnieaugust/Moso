@@ -2,59 +2,34 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 import { Testimonial } from '../types';
+import { Language, translations } from '../utils/translations';
 
-const testimonials: Testimonial[] = [
-  {
-    id: '1',
-    name: 'Khánh Linh',
-    role: 'Food Reviewer',
-    content: 'Mình cực thích chè dưỡng nhan nhưng lười nấu. Moso là chân ái, chỉ cần đổ nước vào gói tự sôi là có chè nóng ăn ngay. Vị ngọt thanh rất vừa miệng.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    name: 'Thu Hà',
-    role: 'Nhân viên ngân hàng',
-    content: 'Mang đi làm ăn trưa rất tiện. Chén chè nhìn sang chảnh, hạt sen sấy thăng hoa mà ăn bùi như sen tươi. Sẽ ủng hộ dài dài.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop'
-  },
-  {
-    id: '3',
-    name: 'Chị Mai',
-    role: 'CEO',
-    content: 'Set quà Tết Moso rất ấn tượng. Đối tác của tôi khen ngợi công nghệ lạ mắt và hương vị tinh tế. Bao bì thiết kế rất có gu.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop'
-  },
-  {
-    id: '4',
-    name: 'Minh Thư',
-    role: 'Sinh viên',
-    content: 'Bao bì đẹp xỉu, chụp hình sống ảo hết nước chấm. Vị chè không bị ngọt gắt như ngoài hàng, ăn xong thấy mát người hẳn.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150&auto=format&fit=crop'
-  },
-  {
-    id: '5',
-    name: 'Cô Hạnh',
-    role: 'Nội trợ',
-    content: 'Mua cho cả nhà dùng thử, ai cũng khen. Tiện lợi cho người già không phải đun nấu lỉnh kỉnh. Giao hàng rất nhanh.',
-    rating: 4,
-    avatar: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=150&auto=format&fit=crop'
-  },
-  {
-    id: '6',
-    name: 'Ngọc Lan',
-    role: 'Designer',
-    content: 'Thiết kế bao bì rất sang trọng, mình hay mua làm quà tặng sinh nhật cho bạn bè. Chất lượng chè ổn định, nhựa đào giòn ngon.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'
-  }
-];
+interface TestimonialsProps {
+  language?: Language;
+}
 
-const Testimonials: React.FC = () => {
+const Testimonials: React.FC<TestimonialsProps> = ({ language = 'vi' }) => {
+  const t = translations[language].testimonials;
+
+  // Static images mapping to make translation array easier
+  const avatars = [
+     'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop',
+     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop',
+     'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop',
+     'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150&auto=format&fit=crop',
+     'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=150&auto=format&fit=crop',
+     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'
+  ];
+
+  const testimonials: Testimonial[] = t.items.map((item: any, index: number) => ({
+      id: String(index + 1),
+      name: item.name,
+      role: item.role,
+      content: item.content,
+      rating: 5, // All 5 stars in this curated list
+      avatar: avatars[index]
+  }));
+
   // Duplicate the list to create a seamless infinite loop
   const carouselItems = [...testimonials, ...testimonials];
 
@@ -63,16 +38,16 @@ const Testimonials: React.FC = () => {
       <div className="container mx-auto px-6 md:px-40 mb-16">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6">
           <div className="max-w-xl">
-             <span className="text-gold-600 dark:text-gold-400 uppercase tracking-widest text-sm font-semibold">Lời Hồi Đáp</span>
+             <span className="text-gold-600 dark:text-gold-400 uppercase tracking-widest text-sm font-semibold">{t.label}</span>
              <h2 className="font-serif text-4xl md:text-5xl text-stone-900 dark:text-stone-100 mt-2">
-               Khách hàng nói gì về <br/> <span className="text-rose-500 dark:text-rose-400">Moso</span>?
+               {t.title1} <br/> <span className="text-rose-500 dark:text-rose-400">{t.title2}</span>{t.questionMark}
              </h2>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex text-gold-500 dark:text-gold-400">
               {[1,2,3,4,5].map(i => <Star key={i} fill="currentColor" size={20} />)}
             </div>
-            <p className="text-stone-600 dark:text-stone-400 text-sm ml-2">4.9/5 từ hơn 2,000 đánh giá</p>
+            <p className="text-stone-600 dark:text-stone-400 text-sm ml-2">{t.rating}</p>
           </div>
         </div>
       </div>

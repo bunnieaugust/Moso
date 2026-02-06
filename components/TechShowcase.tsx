@@ -1,35 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Clock, Zap, Sparkles, Thermometer } from 'lucide-react';
+import { Language, translations } from '../utils/translations';
 
-const steps = [
-  {
-    id: "01",
-    icon: <Zap className="w-5 h-5" />,
-    title: "Kích hoạt",
-    desc: "Bẻ gói kích hoạt nhiệt hoặc đổ nước vào gói tự sôi dưới đáy."
-  },
-  {
-    id: "02",
-    icon: <Thermometer className="w-5 h-5" />,
-    title: "Tự đun nóng",
-    desc: "Phản ứng tỏa nhiệt an toàn bắt đầu ngay lập tức."
-  },
-  {
-    id: "03",
-    icon: <Clock className="w-5 h-5" />,
-    title: "8 Phút",
-    desc: "Chờ đợi ngắn để đạt nhiệt độ lý tưởng 90°C."
-  },
-  {
-    id: "04",
-    icon: <Sparkles className="w-5 h-5" />,
-    title: "Thưởng thức",
-    desc: "Món chè dưỡng nhan nóng hổi, trọn vẹn hương vị."
-  }
-];
+interface TechShowcaseProps {
+  language?: Language;
+}
 
-const TechShowcase: React.FC = () => {
+const TechShowcase: React.FC<TechShowcaseProps> = ({ language = 'vi' }) => {
+  const t = translations[language].tech;
+
+  const icons = [Zap, Thermometer, Clock, Sparkles];
+
+  const steps = t.steps.map((step, index) => ({
+    id: `0${index + 1}`,
+    icon: React.createElement(icons[index], { className: "w-5 h-5" }),
+    ...step
+  }));
+
   return (
     <section id="technology" className="py-24 relative overflow-hidden bg-stone-5 dark:bg-dark-950 transition-colors duration-300">
       <div className="container mx-auto px-6 md:px-40 relative z-10">
@@ -101,7 +89,7 @@ const TechShowcase: React.FC = () => {
                </div>
                <div>
                   <div className="text-3xl font-bold text-white font-serif leading-none">90°C</div>
-                  <div className="text-xs text-stone-300 font-medium mt-1">Nhiệt độ lý tưởng</div>
+                  <div className="text-xs text-stone-300 font-medium mt-1">{t.tempTitle}</div>
                </div>
             </motion.div>
 
@@ -114,13 +102,13 @@ const TechShowcase: React.FC = () => {
           {/* RIGHT: Content Steps */}
           <div className="space-y-10 pl-0 lg:pl-4">
             <div>
-               <span className="text-gold-600 dark:text-gold-400 text-sm font-bold uppercase tracking-widest mb-2 block">Công nghệ đột phá</span>
+               <span className="text-gold-600 dark:text-gold-400 text-sm font-bold uppercase tracking-widest mb-2 block">{t.badge}</span>
                <h2 className="text-5xl md:text-6xl font-serif text-stone-900 dark:text-stone-100 mb-6 leading-tight">
-                 Chè nóng <br/>
-                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-rose-500">mọi lúc, mọi nơi</span>
+                 {t.title1} <br/>
+                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-rose-500">{t.title2}</span>
                </h2>
                <p className="text-stone-600 dark:text-stone-400 text-lg leading-relaxed max-w-lg">
-                 Công nghệ tự đun nóng độc quyền từ Moso, sử dụng phản ứng tỏa nhiệt an toàn để mang đến chén chè nóng hoàn hảo chỉ trong 8 phút, không cần điện hay lửa.
+                 {t.desc}
                </p>
             </div>
 

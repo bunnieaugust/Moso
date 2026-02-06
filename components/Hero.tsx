@@ -1,14 +1,25 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import Button from './ui/Button';
+import { Language, translations } from '../utils/translations';
 
-const Hero: React.FC = () => {
+interface HeroProps {
+  language: Language;
+}
+
+const Hero: React.FC<HeroProps> = ({ language }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
+  
+  // Refined Parallax: Adjusted ranges for subtler, smoother movement
+  // Extended input range to [0, 1000] to slow down the rate of change relative to scroll
+  // Reduced output range to minimize distraction
+  const y1 = useTransform(scrollY, [0, 1000], [0, 120]); 
+  const y2 = useTransform(scrollY, [0, 1000], [0, -80]); 
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+
+  const t = translations[language].hero;
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden py-32 transition-colors duration-300 bg-stone-100 dark:bg-dark-950">
@@ -31,48 +42,48 @@ const Hero: React.FC = () => {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold-500/30 bg-gold-500/5 text-gold-600 dark:text-gold-300 text-xs tracking-widest uppercase">
             <Sparkles size={12} />
-            <span>Tinh hoa chè cung đình</span>
+            <span>{t.badge}</span>
           </div>
           
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-stone-900 dark:text-stone-100">
-            Chè Dưỡng Nhan <br />
-            <span className="text-gradient-gold italic">Tự Sôi</span> <br />
-            Cao Cấp
+            {t.title1} <br />
+            <span className="text-gradient-gold italic">{t.title2}</span> <br />
+            {t.title3}
           </h1>
           
-          <p className="text-lg text-stone-600 dark:text-stone-400 max-w-md leading-relaxed font-light">
-            Tiên phong công nghệ <strong>Tiệt trùng Retort</strong> và <strong>Sấy thăng hoa</strong>. 
-            Moso mang đến chén chè dưỡng nhan nóng hổi chuẩn vị, giữ trọn dưỡng chất chỉ sau 8 phút tự sôi.
-          </p>
+          <p 
+            className="text-lg text-stone-600 dark:text-stone-400 max-w-md leading-relaxed font-light"
+            dangerouslySetInnerHTML={{ __html: t.desc }}
+          />
 
           <div className="flex flex-wrap gap-4 pt-4">
             <Button 
               variant="primary" 
               onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Khám Phá Menu
+              {t.ctaPrimary}
             </Button>
             <Button 
               variant="glass"
               className="!text-stone-600 dark:!text-stone-200 border-stone-200 dark:border-white/10 hover:bg-stone-200/50 dark:hover:bg-white/20"
               onClick={() => document.getElementById('story')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Câu Chuyện Moso
+              {t.ctaSecondary}
             </Button>
           </div>
 
           <div className="flex items-center gap-8 pt-8 border-t border-stone-200 dark:border-white/5">
             <div>
               <p className="text-2xl font-serif text-stone-800 dark:text-white">Retort</p>
-              <p className="text-xs text-stone-500 uppercase tracking-wide">Công nghệ</p>
+              <p className="text-xs text-stone-500 uppercase tracking-wide">{t.feature1}</p>
             </div>
             <div>
               <p className="text-2xl font-serif text-stone-800 dark:text-white">8p</p>
-              <p className="text-xs text-stone-500 uppercase tracking-wide">Tự sôi</p>
+              <p className="text-xs text-stone-500 uppercase tracking-wide">{t.feature2}</p>
             </div>
             <div>
               <p className="text-2xl font-serif text-stone-800 dark:text-white">Zero</p>
-              <p className="text-xs text-stone-500 uppercase tracking-wide">Chất bảo quản</p>
+              <p className="text-xs text-stone-500 uppercase tracking-wide">{t.feature3}</p>
             </div>
           </div>
         </motion.div>
@@ -113,7 +124,7 @@ const Hero: React.FC = () => {
         style={{ opacity }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        <span className="text-[10px] uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400">Cuộn để khám phá</span>
+        <span className="text-[10px] uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400">{t.scroll}</span>
         <ChevronDown className="text-gold-500 dark:text-gold-400 animate-bounce" size={20} />
       </motion.div>
     </section>

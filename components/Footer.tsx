@@ -1,23 +1,33 @@
-import React, { Suspense, Component, ReactNode } from 'react';
+import React, { Component, Suspense, ReactNode, ErrorInfo } from 'react';
 import { Facebook, Instagram, Youtube, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Language, translations } from '../utils/translations';
 
 // Lazy load Spline to avoid blocking initial render
 const Spline = React.lazy(() => import('@splinetool/react-spline'));
 
+interface SplineErrorBoundaryProps {
+  children?: ReactNode;
+  fallback: ReactNode;
+}
+
+interface SplineErrorBoundaryState {
+  hasError: boolean;
+}
+
 // Simple Error Boundary to catch WebGL context errors
-class SplineErrorBoundary extends Component<{children: ReactNode, fallback: ReactNode}, {hasError: boolean}> {
-  constructor(props: {children: ReactNode, fallback: ReactNode}) {
+class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, SplineErrorBoundaryState> {
+  constructor(props: SplineErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(_: Error): SplineErrorBoundaryState {
     return { hasError: true };
   }
 
-  componentDidCatch(error: any, errorInfo: any) {
-    console.warn("Spline 3D Error (WebGL Context Lost):", error);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.warn("Spline 3D Error (WebGL Context Lost):", error, errorInfo);
   }
 
   render() {
@@ -30,9 +40,12 @@ class SplineErrorBoundary extends Component<{children: ReactNode, fallback: Reac
 
 interface FooterProps {
   onNavigate: (view: 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page') => void;
+  language?: Language;
 }
 
-const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+const Footer: React.FC<FooterProps> = ({ onNavigate, language = 'vi' }) => {
+  const t = translations[language].footer;
+
   return (
     // Fixed positioning for Parallax effect on desktop (hidden behind main content)
     // Changed from -z-10 to z-0 to avoid being hidden behind body background if App has transparency
@@ -79,14 +92,19 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             {/* Quick Links */}
             <div>
               <h4 className="font-serif text-white text-lg mb-6 flex items-center gap-2">
-                <span className="w-8 h-[1px] bg-gold-500"></span> Khám Phá
+                <span className="w-8 h-[1px] bg-gold-500"></span> {t.explore}
               </h4>
               <ul className="space-y-4 text-sm text-stone-400">
-                {['Về Chúng Tôi', 'Câu Chuyện', 'Thực Đơn', 'Blog'].map((item) => (
-                  <li key={item}>
+                {[
+                  { label: t.links.about, href: '#' },
+                  { label: t.links.story, href: '#' },
+                  { label: t.links.menu, href: '#' },
+                  { label: t.links.blog, href: '#' }
+                ].map((item) => (
+                  <li key={item.label}>
                     <button className="hover:text-gold-400 hover:translate-x-1 transition-all duration-300 flex items-center gap-2 group">
                        <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                       {item}
+                       {item.label}
                     </button>
                   </li>
                 ))}
@@ -96,20 +114,20 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             {/* Support Links */}
             <div>
               <h4 className="font-serif text-white text-lg mb-6 flex items-center gap-2">
-                <span className="w-8 h-[1px] bg-gold-500"></span> Hỗ Trợ
+                <span className="w-8 h-[1px] bg-gold-500"></span> {t.support}
               </h4>
               <ul className="space-y-4 text-sm text-stone-400">
                 <li>
-                  <button onClick={() => onNavigate('return-policy')} className="hover:text-gold-400 transition-colors">Chính sách đổi trả</button>
+                  <button onClick={() => onNavigate('return-policy')} className="hover:text-gold-400 transition-colors">{t.links.return}</button>
                 </li>
                 <li>
-                  <button onClick={() => onNavigate('usage-guide')} className="hover:text-gold-400 transition-colors">Hướng dẫn sử dụng</button>
+                  <button onClick={() => onNavigate('usage-guide')} className="hover:text-gold-400 transition-colors">{t.links.guide}</button>
                 </li>
                 <li>
-                  <button onClick={() => onNavigate('shipping-policy')} className="hover:text-gold-400 transition-colors">Vận chuyển</button>
+                  <button onClick={() => onNavigate('shipping-policy')} className="hover:text-gold-400 transition-colors">{t.links.shipping}</button>
                 </li>
                 <li>
-                  <button onClick={() => onNavigate('contact-page')} className="hover:text-gold-400 transition-colors">Liên hệ</button>
+                  <button onClick={() => onNavigate('contact-page')} className="hover:text-gold-400 transition-colors">{t.links.contact}</button>
                 </li>
               </ul>
             </div>
@@ -119,11 +137,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
          <div className="mt-12 pt-8 border-t border-white/5">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                <div className="space-y-2">
-                  <p className="text-stone-300 font-serif text-lg">Đăng ký nhận tin</p>
+                  <p className="text-stone-300 font-serif text-lg">{t.subscribe.title}</p>
                   <div className="flex gap-2">
                      <input 
                         type="email" 
-                        placeholder="Email của bạn" 
+                        placeholder={t.subscribe.placeholder} 
                         className="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white focus:border-gold-500 outline-none w-full md:w-64"
                      />
                      <button className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center hover:bg-gold-600 transition-colors">
@@ -142,10 +160,10 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </div>
             
             <div className="mt-8 flex justify-between items-center text-[10px] text-stone-600 uppercase tracking-wider">
-               <p>&copy; 2024 Moso Beauty Dessert.</p>
+               <p>{t.copyright}</p>
                <div className="flex gap-4">
-                  <a href="#" className="hover:text-stone-400">Privacy</a>
-                  <a href="#" className="hover:text-stone-400">Terms</a>
+                  <a href="#" className="hover:text-stone-400">{t.privacy}</a>
+                  <a href="#" className="hover:text-stone-400">{t.terms}</a>
                </div>
             </div>
          </div>

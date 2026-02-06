@@ -26,8 +26,10 @@ import UsageGuide from './components/UsageGuide';
 import ShippingPolicy from './components/ShippingPolicy';
 import ContactPage from './components/ContactPage';
 import AboutPage from './components/AboutPage'; // Import AboutPage
+import RegisterPage from './components/RegisterPage'; // Import RegisterPage
 
 import { CartItem, Product, User, Order, OrderInfo } from './types';
+import { Language, translations } from './utils/translations'; // Import Language type
 
 // Initialize Stripe with a public test key
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
@@ -60,7 +62,7 @@ const INITIAL_DB_ORDERS: Order[] = [
 ];
 
 // Define possible views including new pages
-type ViewType = 'home' | 'shop' | 'about' | 'product' | 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page';
+type ViewType = 'home' | 'shop' | 'about' | 'product' | 'return-policy' | 'usage-guide' | 'shipping-policy' | 'contact-page' | 'register';
 
 function App() {
   // State
@@ -87,8 +89,9 @@ function App() {
   // New State: Save shipping info from last successful order
   const [savedShippingInfo, setSavedShippingInfo] = useState<OrderInfo | null>(null);
   
-  // Theme State
+  // Theme & Language State
   const [isDark, setIsDark] = useState(true);
+  const [language, setLanguage] = useState<Language>('vi');
 
   // Initialize Theme
   useEffect(() => {
@@ -101,6 +104,10 @@ function App() {
 
   const toggleTheme = () => {
     setIsDark(!isDark);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'vi' ? 'en' : 'vi');
   };
 
   // View Navigation Logic
@@ -277,10 +284,16 @@ function App() {
   const handleLogin = (name: string, email: string) => {
     setUser({ name, email, avatar: undefined });
   };
+  
+  const handleLogout = () => {
+    setUser(null);
+  };
 
-  const handleUserIconClick = () => {
-    if (user) {
-      setIsOrderHistoryOpen(true);
+  // Updated handler to switch between Modal Login and Page Register
+  const handleAuthAction = (action: 'login' | 'register' = 'login') => {
+    if (action === 'register') {
+      setView('register');
+      window.scrollTo(0, 0);
     } else {
       setIsAuthOpen(true);
     }
@@ -290,6 +303,8 @@ function App() {
   const userOrders = user 
     ? allOrders.filter(order => order.shippingInfo.email?.toLowerCase() === user.email.toLowerCase())
     : [];
+
+  const t = translations[language];
 
   // View Rendering Helper
   const renderMainContent = () => {
@@ -326,23 +341,38 @@ function App() {
         return <ShippingPolicy onBack={() => setView('home')} />;
       case 'contact-page':
         return <ContactPage onBack={() => setView('home')} />;
+      case 'register':
+        return (
+          <RegisterPage 
+            onLoginClick={() => {
+              setView('home'); // Or stay on page but open modal? Let's go home & open modal
+              setTimeout(() => handleAuthAction('login'), 100);
+            }}
+            onRegisterSuccess={(name, email) => {
+              handleLogin(name, email);
+              setView('home');
+            }}
+          />
+        );
       case 'home':
       default:
         return (
           <>
-            <Hero />
+            <Hero language={language} />
             
             <section id="story" className="py-20 text-center container mx-auto px-6">
-              <p className="text-gold-500 dark:text-gold-400 uppercase tracking-[0.3em] text-xs mb-4 animate-pulse">Triết Lý Moso</p>
+              <p className="text-gold-500 dark:text-gold-400 uppercase tracking-[0.3em] text-xs mb-4 animate-pulse">
+                {t.story.label}
+              </p>
               <p className="font-serif text-2xl md:text-3xl text-stone-600 dark:text-stone-300 italic max-w-2xl mx-auto">
-                "Không chỉ là chè dưỡng nhan, Moso là sự kết hợp hoàn hảo giữa y học cổ truyền và công nghệ thực phẩm hiện đại, mang đến sự tiện lợi mà vẫn giữ nguyên vẹn tinh túy của đất trời."
+                {t.story.content}
               </p>
             </section>
 
-            <ProductShowcase onProductSelect={handleProductSelect} />
-            <TechShowcase />
-            <Testimonials />
-            <Contact />
+            <ProductShowcase onProductSelect={handleProductSelect} language={language} />
+            <TechShowcase language={language} />
+            <Testimonials language={language} />
+            <Contact language={language} />
           </>
         );
     }
@@ -356,12 +386,16 @@ function App() {
         wishlistCount={wishlistItems.length}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenWishlist={() => setIsWishlistOpen(true)}
-        onOpenAuth={handleUserIconClick}
+        onOpenAuth={handleAuthAction} // Updated prop
         onOpenLookup={() => setIsLookupOpen(true)}
         user={user}
+        onLogout={handleLogout}
         isDark={isDark}
         toggleTheme={toggleTheme}
         onNavClick={handleNavClick}
+        onViewOrderHistory={() => setIsOrderHistoryOpen(true)}
+        language={language}
+        toggleLanguage={toggleLanguage}
       />
       
       {/* 
@@ -378,7 +412,7 @@ function App() {
       </div>
       
       {/* Footer sits outside the main flow on desktop (fixed), behaving like a reveal */}
-      <Footer onNavigate={handleFooterNavigate} />
+      <Footer onNavigate={handleFooterNavigate} language={language} />
 
       {/* Overlays */}
       <CartDrawer 
@@ -405,6 +439,10 @@ function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onLogin={handleLogin}
+        onRegisterClick={() => {
+          setIsAuthOpen(false);
+          handleAuthAction('register');
+        }}
       />
 
       {/* Replaced Modal with Page View, kept Checkout and other modals */}
